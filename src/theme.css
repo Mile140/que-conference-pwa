@@ -1,0 +1,170 @@
+/* MikeCarey.Tech brand palette (spec §5.1) — sanity-checked hex values,
+   kept as CSS custom properties so both light and dark themes derive from
+   the same source of truth. */
+:root {
+  --navy: #15294d;
+  --steel-blue: #2e5a8c;
+  --mid-blue: #5b7fa6;
+  --pale-blue: #e9eff6;
+  --gold: #b8912e;
+  --white: #ffffff;
+  --ink: #1f2933;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  color-scheme: light;
+  --bg: var(--white);
+  --bg-elevated: var(--pale-blue);
+  --text: var(--ink);
+  --text-muted: var(--mid-blue);
+  --brand-primary: var(--navy);
+  --brand-accent: var(--steel-blue);
+  --brand-highlight: var(--gold);
+  --border: #d7e2ef;
+  --link: var(--steel-blue);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1c33;
+  --bg-elevated: #17294a;
+  --text: #eef2f7;
+  --text-muted: #9fb3cc;
+  --brand-primary: var(--steel-blue);
+  --brand-accent: #7ba3d0;
+  --brand-highlight: var(--gold);
+  --border: #26385c;
+  --link: #8fb6e6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+a {
+  color: var(--link);
+}
+
+button {
+  font-family: inherit;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.app-header {
+  background: var(--brand-primary);
+  color: var(--white);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header .brand {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: 1.05rem;
+}
+
+.theme-toggle {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.app-main {
+  flex: 1;
+  padding: var(--space-4);
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.app-nav {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-nav a {
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.9rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.app-nav a.active {
+  background: var(--brand-accent);
+  color: var(--white);
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.badge-gold {
+  display: inline-block;
+  background: var(--brand-highlight);
+  color: var(--navy);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.app-footer {
+  border-top: 1px solid var(--border);
+  padding: var(--space-4);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.app-footer .credit {
+  margin-top: var(--space-2);
+}
