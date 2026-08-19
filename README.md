@@ -54,3 +54,22 @@ Schema additions beyond spec §6 (flagged to Mike before building, not a silent 
 Not yet built (later phases per spec §12): session data/Now & Next logic (Phase 2), Eventbrite import + passwordless auth + directory (Phase 3), Day-3 questions/learning list/feedback/push (Phase 4), speakers/sponsors/branding pages (Phase 5), venue/info content (Phase 6), admin console (Phase 7), photo wall + launch polish (Phase 8).
 
 Admin auth mechanism (email/password vs. something else) is still an open decision — flag for Phase 3.
+
+## Project status — Phase 2: Schedule & Sessions
+
+Done:
+
+- Real agenda data loaded into `sessions` (23 rows, from the board's working-draft workbook) — schema additions: `presenter_text` (free-text presenter/team name; proper speaker linking comes in Phase 5) and `source_row_key` (stable key for idempotent re-import).
+- `scripts/import_sessions.py` — reusable/re-runnable importer. Re-run it whenever the board updates the workbook; it upserts by `source_row_key` and deliberately leaves `room`/`lab_notes` alone on updates so hand-edits made in Supabase survive a re-import. See the script's docstring for setup (needs the Supabase **service role** key, kept in a local `scripts/.env`, never committed, never exposed to the frontend).
+- Schedule page: sessions grouped by day, filterable by type/room/track.
+- Session detail page (`/schedule/:id`): title, time, room, type, presenter, description, lab notes, materials link.
+- Real "Now & Next" on the landing page, computed from live Supabase data, always displayed in venue-local (Pacific) time regardless of the viewer's device timezone.
+
+Known data gaps carried over from the source workbook (fix directly in Supabase, or update the workbook and re-run the import script):
+
+- No `room` assigned for most sessions (only the two "Round Tables 2" rows have rooms, per your instruction).
+- No `track` data at all yet.
+- Presenters are mostly team/company names ("CC", "Board") rather than individuals — stored as plain text (`presenter_text`), not yet linked to real speaker profiles.
+- `materials_url` is empty for every session (spec allows this — external links only, may be few or none).
+
+Not yet built: personal agenda / add-to-schedule (Phase 3, needs verified-attendee auth), session feedback control (Phase 4), speaker photo/bio linking (Phase 5).

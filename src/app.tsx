@@ -3,6 +3,8 @@ import Header from "./components/Header";
 import Nav from "./components/Nav";
 import SponsorFooter from "./components/SponsorFooter";
 import Home from "./pages/Home";
+import Schedule from "./pages/Schedule";
+import SessionDetail from "./pages/SessionDetail";
 import Stub from "./pages/Stub";
 
 export default function App() {
@@ -13,12 +15,8 @@ export default function App() {
       <main class="app-main">
         <Router>
           <Home path="/" />
-          <Stub
-            path="/schedule"
-            title="Schedule"
-            phase="Phase 2"
-            blurb="Full schedule by day, filterable by track/room/type, with personal agenda."
-          />
+          <Schedule path="/schedule" />
+          <SessionDetail path="/schedule/:id" />
           <Stub
             path="/directory"
             title="Attendee Directory"

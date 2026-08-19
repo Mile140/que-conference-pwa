@@ -1,5 +1,13 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "../lib/supabase";
+import RouterLink from "../components/RouterLink";
+import {
+  formatTimeRange,
+  partitionNowNext,
+  TYPE_LABELS,
+  useSessions,
+  type Session,
+} from "../lib/sessions";
 
 interface Announcement {
   id: string;
@@ -14,12 +22,62 @@ interface HomeProps {
   path?: string;
 }
 
+function SessionRow({ session }: { session: Session }) {
+  return (
+    <RouterLink href={`/schedule/${session.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+      <div class="card">
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+          <strong>{session.title}</strong>
+          <span class="badge-gold">{TYPE_LABELS[session.type]}</span>
+        </div>
+        <div style={{ color: "var(--text-muted)", marginTop: 4 }}>
+          {formatTimeRange(session)}
+          {session.room ? ` · ${session.room}` : ""}
+        </div>
+      </div>
+    </RouterLink>
+  );
+}
+
+function NowNext() {
+  const { sessions, loading } = useSessions();
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    // Re-evaluate periodically so sessions roll from "next" to "now" to
+    // "past" live without requiring a page reload.
+    const id = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (loading) return <p>Loading schedule…</p>;
+  if (sessions.length === 0) {
+    return <p style={{ color: "var(--text-muted)" }}>Schedule hasn't been loaded yet.</p>;
+  }
+
+  const { current, next } = partitionNowNext(sessions, now);
+
+  return (
+    <>
+      <h3 style={{ marginBottom: 8 }}>Now</h3>
+      {current.length === 0 ? (
+        <p style={{ color: "var(--text-muted)" }}>Nothing happening right now.</p>
+      ) : (
+        current.map((s) => <SessionRow session={s} key={s.id} />)
+      )}
+
+      <h3 style={{ marginBottom: 8, marginTop: 16 }}>Next</h3>
+      {next.length === 0 ? (
+        <p style={{ color: "var(--text-muted)" }}>That's the end of the schedule.</p>
+      ) : (
+        next.map((s) => <SessionRow session={s} key={s.id} />)
+      )}
+    </>
+  );
+}
+
 /**
- * Landing screen (spec §3.1): Now & Next + announcements feed, newest
- * first. Session data and the real "what's happening right now across
- * every room" logic land in Phase 2 — this wires the announcements feed
- * live against Supabase so the schema/RLS/realtime path is proven end to
- * end before more content is layered on.
+ * Landing screen (spec §3.1): Now & Next + announcements feed, newest first.
  */
 export default function Home(_props: HomeProps) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -63,10 +121,7 @@ export default function Home(_props: HomeProps) {
     <>
       <section class="card">
         <h2 style={{ marginTop: 0 }}>Now &amp; Next</h2>
-        <p style={{ color: "var(--text-muted)" }}>
-          Session schedule lands in Phase 2 — this will show what's running right now
-          across every room, plus what's up next.
-        </p>
+        <NowNext />
       </section>
 
       <section>

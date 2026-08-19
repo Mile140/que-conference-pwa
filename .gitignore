@@ -4,5 +4,6 @@ dev-dist/
 .wrangler/
 .env
 .env.local
+scripts/.env
 *.local
 .DS_Store
