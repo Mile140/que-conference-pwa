@@ -7,6 +7,13 @@ interface Announcement {
   created_at: string;
 }
 
+interface HomeProps {
+  // preact-router passes `path` to route children; declared explicitly
+  // here rather than relying on preact-router's module augmentation,
+  // which doesn't reliably apply under the automatic JSX runtime.
+  path?: string;
+}
+
 /**
  * Landing screen (spec §3.1): Now & Next + announcements feed, newest
  * first. Session data and the real "what's happening right now across
@@ -14,7 +21,7 @@ interface Announcement {
  * live against Supabase so the schema/RLS/realtime path is proven end to
  * end before more content is layered on.
  */
-export default function Home() {
+export default function Home(_props: HomeProps) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
 

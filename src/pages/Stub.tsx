@@ -2,6 +2,7 @@ interface StubProps {
   title: string;
   phase: string;
   blurb: string;
+  path?: string; // passed by preact-router to route children
 }
 
 /**

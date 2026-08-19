@@ -1,0 +1,13 @@
+{
+  // Cloudflare's Git-connected deploy flow now provisions "Workers with
+  // static assets" instead of the older, separate "Pages" product -- same
+  // end result (static site on Cloudflare's edge, custom domain support),
+  // just a different config file. This is what `npx wrangler deploy`
+  // (the deploy command in the dashboard) reads.
+  "name": "que-conference-pwa",
+  "compatibility_date": "2026-08-18",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
