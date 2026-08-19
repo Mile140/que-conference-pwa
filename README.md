@@ -25,7 +25,7 @@ npm run dev
 npm run build
 ```
 
-Output goes to `dist/`. `public/_redirects` makes Cloudflare Pages serve `index.html` for all routes (client-side routing via `preact-router`).
+Output goes to `dist/`. SPA fallback (serving `index.html` for all client-side routes) is handled by `not_found_handling: "single-page-application"` in `wrangler.jsonc` — no `_redirects` file needed (that was a Pages-era mechanism; combining it with the Workers static-assets fallback causes a redirect-loop error on deploy).
 
 ## Deploying
 
