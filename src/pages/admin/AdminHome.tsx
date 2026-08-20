@@ -1,0 +1,81 @@
+import AdminGuard from "../../components/AdminGuard";
+import RouterLink from "../../components/RouterLink";
+import { signOut } from "../../lib/auth";
+import { useSettings } from "../../lib/settings";
+import { supabase } from "../../lib/supabase";
+
+interface AdminHomeProps {
+  path?: string;
+}
+
+export default function AdminHome(_props: AdminHomeProps) {
+  return (
+    <AdminGuard>
+      <AdminHomeContent />
+    </AdminGuard>
+  );
+}
+
+function AdminHomeContent() {
+  const { settings, loading } = useSettings();
+
+  async function setSetting(key: "feedback_enabled" | "questions_open", value: boolean) {
+    const { error } = await supabase.from("settings").update({ value }).eq("key", key);
+    if (error) console.error(`Failed to update ${key}`, error);
+    // No local state update needed -- useSettings is realtime-subscribed
+    // and will pick up the change itself.
+  }
+
+  return (
+    <>
+      <section class="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2 style={{ margin: 0 }}>Admin</h2>
+        <button type="button" onClick={signOut} style={{ padding: "6px 12px" }}>
+          Sign out
+        </button>
+      </section>
+
+      <section class="card">
+        <h3 style={{ marginTop: 0 }}>Global toggles</h3>
+        {loading ? (
+          <p>Loading…</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={settings.feedback_enabled}
+                onChange={(e) => setSetting("feedback_enabled", (e.target as HTMLInputElement).checked)}
+              />
+              Session feedback enabled
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={settings.questions_open}
+                onChange={(e) => setSetting("questions_open", (e.target as HTMLInputElement).checked)}
+              />
+              Day-3 question submission open
+            </label>
+          </div>
+        )}
+      </section>
+
+      <section class="card">
+        <h3 style={{ marginTop: 0 }}>Moderation & content</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <RouterLink href="/admin/moderation">Moderate questions</RouterLink>
+          <RouterLink href="/admin/announcements">Announcements</RouterLink>
+        </div>
+      </section>
+
+      <section class="card">
+        <p style={{ color: "var(--text-muted)", margin: 0 }}>
+          Content editing (sessions, speakers, sponsors, maps, info pages), Eventbrite import, and
+          the usage-stats dashboard aren't in the admin console yet — use the Supabase dashboard
+          directly for those in the meantime.
+        </p>
+      </section>
+    </>
+  );
+}

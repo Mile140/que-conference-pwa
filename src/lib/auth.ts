@@ -23,6 +23,30 @@ export const authSession = signal<Session | null>(null);
 export const attendee = signal<Attendee | null>(null);
 export const authLoading = signal(true);
 
+/**
+ * null = not yet checked (e.g. still loading auth state), false = checked
+ * and not an admin, true = confirmed admin. Backed by the `is_admin()`
+ * SECURITY DEFINER function (RLS policies already call it, and it's
+ * intentionally callable by anon/authenticated -- see Supabase advisors)
+ * rather than a direct `select from admins`, since that table has no
+ * SELECT policy at all (default-deny, including for the admin's own row).
+ */
+export const isAdmin = signal<boolean | null>(null);
+
+async function refreshAdminStatus() {
+  if (!authSession.value) {
+    isAdmin.value = false;
+    return;
+  }
+  const { data, error } = await supabase.rpc("is_admin");
+  if (error) {
+    console.error("Failed to check admin status", error);
+    isAdmin.value = false;
+    return;
+  }
+  isAdmin.value = data === true;
+}
+
 /** True once we have both a live Supabase auth session and a linked attendees row. */
 export function isVerified(): boolean {
   return authSession.value !== null && attendee.value !== null;
@@ -91,16 +115,19 @@ export async function refreshAttendee() {
 export function initAuth() {
   supabase.auth.getSession().then(async ({ data }) => {
     authSession.value = data.session;
-    if (data.session) await refreshAttendee();
+    if (data.session) {
+      await Promise.all([refreshAttendee(), refreshAdminStatus()]);
+    }
     authLoading.value = false;
   });
 
   supabase.auth.onAuthStateChange(async (_event, session) => {
     authSession.value = session;
     if (session) {
-      await refreshAttendee();
+      await Promise.all([refreshAttendee(), refreshAdminStatus()]);
     } else {
       attendee.value = null;
+      isAdmin.value = false;
     }
   });
 }
@@ -121,6 +148,18 @@ export async function verifyLoginCode(
     email: email.trim().toLowerCase(),
     token: token.trim(),
     type: "email",
+  });
+  return { error: error?.message ?? null };
+}
+
+/** Admin login (spec §3.13/D-decisions: email+password, separate from attendee OTP). */
+export async function signInAdminPassword(
+  email: string,
+  password: string
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
   });
   return { error: error?.message ?? null };
 }

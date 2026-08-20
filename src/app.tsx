@@ -16,6 +16,10 @@ import Sponsors from "./pages/Sponsors";
 import SponsorDetail from "./pages/SponsorDetail";
 import Maps from "./pages/Maps";
 import Info from "./pages/Info";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminHome from "./pages/admin/AdminHome";
+import AdminModeration from "./pages/admin/AdminModeration";
+import AdminAnnouncements from "./pages/admin/AdminAnnouncements";
 
 export default function App() {
   return (
@@ -38,6 +42,10 @@ export default function App() {
           <SponsorDetail path="/sponsors/:id" />
           <Maps path="/maps" />
           <Info path="/info" />
+          <AdminLogin path="/admin/login" />
+          <AdminHome path="/admin" />
+          <AdminModeration path="/admin/moderation" />
+          <AdminAnnouncements path="/admin/announcements" />
         </Router>
       </main>
       <SponsorFooter />

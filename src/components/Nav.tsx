@@ -1,4 +1,5 @@
 import RouterLink from "./RouterLink";
+import { isAdmin } from "../lib/auth";
 
 const LINKS: Array<{ href: string; label: string }> = [
   { href: "/", label: "Now & Next" },
@@ -20,6 +21,11 @@ export default function Nav() {
           {link.label}
         </RouterLink>
       ))}
+      {isAdmin.value && (
+        <RouterLink href="/admin" activeClassName="active">
+          Admin
+        </RouterLink>
+      )}
     </nav>
   );
 }

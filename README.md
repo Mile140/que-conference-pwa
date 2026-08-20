@@ -133,6 +133,20 @@ Done:
 - `venue_maps`: add rows with `title`, `type` (e.g. "venue" / "hotel" / "offsite"), `description`, and optionally `image_url` (upload the image to the existing `maps` Storage bucket first, then paste its public URL here).
 - `info_pages`: add rows with `title`, `body`, and `published = true` for anything you want visible (wifi password, parking, local attractions, etc.). `sort` controls display order on both tables.
 
+## Project status — Phase 7 (in progress): Admin & Analytics
+
+You asked for the full Phase 7 scope (admin core, announcements, content CRUD, Eventbrite import + usage-stats). Given the size, this is landing in ordered chunks rather than one drop — this update covers the first two.
+
+Done:
+
+- **Admin login** (`/admin/login`): email + password via Supabase Auth (separate from attendee OTP, per the Phase 3 decision). Admin status is checked via the `is_admin()` RPC, not a direct `select from admins` — that table has no SELECT policy at all (intentional default-deny from Phase 1), so even an admin can't read it directly; `is_admin()` is the sanctioned way in, and it's already exposed for exactly this reason.
+- **Admin home** (`/admin`): global toggle switches for `feedback_enabled` and `questions_open`, replacing the direct-SQL updates from earlier phases. Realtime-backed like everywhere else these settings are read.
+- **Question moderation** (`/admin/moderation`): lists every question including hidden ones (RLS already let admins see those), hide/unhide toggle.
+- **Announcements** (`/admin/announcements`): compose and post new announcements in-app, list existing ones, delete. Push delivery still isn't wired up (Phase 4 follow-up), so this posts to the in-app feed only, same as before.
+- The "Admin" nav link only appears once you're signed in as admin — there's no public link to `/admin/login`, you'll need to navigate there directly the first time (bookmark it).
+
+Not yet built (still coming): content CRUD for sessions/speakers/sponsors/maps/info pages, Eventbrite import in-app, and the usage-stats dashboard (which also needs event-tracking instrumentation added throughout the app first — nothing currently writes to the `analytics_events` table).
+
 ## App shell updates (post-Phase 4)
 
 - **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".

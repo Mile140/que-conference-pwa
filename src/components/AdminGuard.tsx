@@ -1,0 +1,26 @@
+import type { ComponentChildren } from "preact";
+import { authSession, isAdmin } from "../lib/auth";
+
+/**
+ * Shared guard for every /admin/* page: shows a loading state while admin
+ * status is still being checked, a sign-in prompt for non-admins, and the
+ * page content only once `is_admin()` has confirmed true.
+ */
+export default function AdminGuard({ children }: { children: ComponentChildren }) {
+  if (isAdmin.value === null) {
+    return <p>Checking admin access…</p>;
+  }
+
+  if (!authSession.value || !isAdmin.value) {
+    return (
+      <section class="card">
+        <h2 style={{ marginTop: 0 }}>Admin</h2>
+        <p>
+          <a href="/admin/login">Sign in</a> with your admin account to continue.
+        </p>
+      </section>
+    );
+  }
+
+  return <>{children}</>;
+}
