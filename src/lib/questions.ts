@@ -42,7 +42,13 @@ export function useQuestions() {
     if (vErr) console.error("Failed to load question votes", vErr);
     setError(qErr?.message ?? vErr?.message ?? null);
 
-    setQuestions((qData as QuestionRow[]) ?? []);
+    // RLS lets admins see hidden rows too (needed for the moderation page),
+    // but that means an admin viewing this public-facing page would see a
+    // different, misleading picture of what attendees actually see. Filter
+    // client-side so this page is always the true attendee view regardless
+    // of who's signed in -- moderation (AdminModeration.tsx) is the one
+    // place hidden questions should actually show up.
+    setQuestions(((qData as QuestionRow[]) ?? []).filter((q) => !q.hidden));
 
     const counts = new Map<string, number>();
     const mine = new Set<string>();
