@@ -2,6 +2,8 @@ import { useEffect, useState } from "preact/hooks";
 import { supabase } from "../lib/supabase";
 import { attendee, authSession } from "../lib/auth";
 import { useAgenda } from "../lib/agenda";
+import { useFeedback } from "../lib/feedback";
+import { useSettings } from "../lib/settings";
 import { formatDay, formatTimeRange, TYPE_LABELS, type Session } from "../lib/sessions";
 
 interface SessionDetailProps {
@@ -14,6 +16,8 @@ export default function SessionDetail({ id }: SessionDetailProps) {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const { sessionIds, toggle } = useAgenda();
+  const { rating, rate } = useFeedback(session?.id);
+  const { settings } = useSettings();
   const verified = authSession.value && attendee.value;
 
   useEffect(() => {
@@ -94,6 +98,38 @@ export default function SessionDetail({ id }: SessionDetailProps) {
             View materials
           </a>
         </p>
+      )}
+
+      {verified && settings.feedback_enabled && (
+        <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border, #ddd)" }}>
+          <p style={{ margin: "0 0 6px" }}>
+            <strong>How was this session?</strong>
+          </p>
+          <div style={{ display: "flex", gap: 6 }}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => rate(n)}
+                title={`${n} out of 5`}
+                style={{
+                  padding: "6px 12px",
+                  background: rating !== null && n <= rating ? "var(--brand-accent)" : "transparent",
+                  color: rating !== null && n <= rating ? "var(--white)" : "var(--text)",
+                  border: "1px solid var(--brand-accent)",
+                  borderRadius: 6,
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          {rating !== null && (
+            <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: 6, marginBottom: 0 }}>
+              Thanks -- you rated this {rating}/5. Tap another number to change it.
+            </p>
+          )}
+        </div>
       )}
     </article>
   );

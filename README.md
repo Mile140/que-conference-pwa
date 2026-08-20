@@ -86,9 +86,21 @@ Done:
 - Personal agenda: add/remove on the session detail page and a star indicator + "My agenda only" filter on the Schedule page. No reminders yet — that's push infrastructure, Phase 4.
 - RLS fix: the original `attendees` UPDATE policy couldn't actually let anyone claim their pre-imported row (chicken-and-egg on `auth_user_id`) — patched so a verified attendee can claim an unclaimed row matching their verified email, and tightened INSERT so a self-created row must use the attendee's own verified email.
 
-Outstanding, blocking real attendee use:
+Resend SMTP is live (domain verified, custom SMTP configured in Supabase) — real OTP emails are delivering. Note the default "Confirm signup" / "Magic Link" templates only include a clickable link out of the box; they were edited to include `{{ .Token }}` so attendees actually get a 6-digit code to type into `/verify`.
 
-- **Resend SMTP not finished** — domain verification for `quegroup.mikecarey.tech` and wiring the SMTP credentials into Supabase's dashboard are manual steps only you can do (see chat). Until then, Supabase's default mailer caps at 2 emails/hour — fine for solo testing, not for real onboarding.
-- **Admin account** — needs to be created in the Supabase dashboard (Authentication → Users → Add User) and linked into the `admins` table; see chat for exact steps.
+Outstanding:
 
-Not yet built: session feedback (Phase 4), Day-3 questions/learning list/push (Phase 4), speaker photo/bio linking + real presenter records (Phase 5).
+- **Admin account** — still needs to be created in the Supabase dashboard (Authentication → Users → Add User) and linked into the `admins` table; see chat for exact steps.
+
+## Project status — Phase 4: Engagement
+
+Done:
+
+- Day-3 discussion questions (`/questions`): verified attendees submit and upvote, public read (guests see question text but not the asker's name — attendee names are RLS-gated to verified users, an accepted tradeoff). Gated by `settings.questions_open`. Realtime-backed, sorted by upvotes then submission order.
+- Personal learning list (`/learning`): fully private per-attendee CRUD (title + notes + done), never shown to anyone else.
+- Session feedback: 1–5 rating on the session detail page, one per attendee per session (upsert), gated by `settings.feedback_enabled`.
+- `settings` table added to the Realtime publication so admin toggles (`feedback_enabled`, `questions_open`) take effect live for anyone with the app open, without a refresh — flipping them today still requires a direct SQL update until the Phase 7 admin console exists.
+
+Deliberately deferred (by your choice, to de-risk this phase): **push notifications**. The `push_subscriptions` table and `agenda_items.remind` column exist from Phase 1, but there's no opt-in UI, VAPID keypair, edge function, or reminder cron yet — announcements and any future reminders are in-app/Realtime only for now. This is real new infrastructure (service worker push handling, a Supabase Edge Function to send pushes, a cron job for pre-session reminders) and is scoped as its own follow-up rather than bundled here.
+
+Not yet built: photo wall (Phase 8), speaker photo/bio linking + real presenter records (Phase 5), push notification delivery (follow-up to Phase 4).

@@ -6,6 +6,8 @@ import Home from "./pages/Home";
 import Schedule from "./pages/Schedule";
 import SessionDetail from "./pages/SessionDetail";
 import Directory from "./pages/Directory";
+import Questions from "./pages/Questions";
+import LearningList from "./pages/LearningList";
 import Verify from "./pages/Verify";
 import Profile from "./pages/Profile";
 import Stub from "./pages/Stub";
@@ -21,6 +23,8 @@ export default function App() {
           <Schedule path="/schedule" />
           <SessionDetail path="/schedule/:id" />
           <Directory path="/directory" />
+          <Questions path="/questions" />
+          <LearningList path="/learning" />
           <Verify path="/verify" />
           <Profile path="/profile" />
           <Stub
