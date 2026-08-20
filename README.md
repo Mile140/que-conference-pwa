@@ -120,6 +120,19 @@ Done:
 - No real event sponsors loaded yet (only the seeded MikeCarey.Tech row exists) — add rows to `sponsors` (name, logo_url, description, website, contact, sponsoring_text, display_order) as you get them.
 - Neither `session_speakers` nor `sessions.sponsor_id` / `attendees.sponsor_id` are populated — once speakers/sponsors are flagged, link them to their actual sessions the same way (direct SQL or the Supabase table editor, until the Phase 7 admin console exists).
 
+## Project status — Phase 6: Venue & Info
+
+Done:
+
+- Maps page (`/maps`): lists `venue_maps` rows (title, image, description, type badge) — venue/room layout, hotel map, and the off-site event map all use the same table, distinguished by a free-text `type` field.
+- Info page (`/info`): lists published `info_pages` rows (title + body text) — wifi, hotel parking, local attractions, and anything else you add. Unpublished drafts stay hidden (RLS already filtered on `published = true` for non-admins from Phase 1).
+- Both tables and their RLS already existed unused in the schema since Phase 1 — no migration needed this phase, just the UI.
+
+**Content still needed from you** — both tables are currently empty:
+
+- `venue_maps`: add rows with `title`, `type` (e.g. "venue" / "hotel" / "offsite"), `description`, and optionally `image_url` (upload the image to the existing `maps` Storage bucket first, then paste its public URL here).
+- `info_pages`: add rows with `title`, `body`, and `published = true` for anything you want visible (wifi password, parking, local attractions, etc.). `sort` controls display order on both tables.
+
 ## App shell updates (post-Phase 4)
 
 - **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".

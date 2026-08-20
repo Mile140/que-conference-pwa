@@ -14,7 +14,8 @@ import Profile from "./pages/Profile";
 import Speakers from "./pages/Speakers";
 import Sponsors from "./pages/Sponsors";
 import SponsorDetail from "./pages/SponsorDetail";
-import Stub from "./pages/Stub";
+import Maps from "./pages/Maps";
+import Info from "./pages/Info";
 
 export default function App() {
   return (
@@ -35,18 +36,8 @@ export default function App() {
           <Speakers path="/speakers" />
           <Sponsors path="/sponsors" />
           <SponsorDetail path="/sponsors/:id" />
-          <Stub
-            path="/maps"
-            title="Venue &amp; Maps"
-            phase="Phase 6"
-            blurb="Venue map, hotel/parking info, and the off-site event map."
-          />
-          <Stub
-            path="/info"
-            title="Info"
-            phase="Phase 6"
-            blurb="Wifi, parking, local attractions, and other admin-editable info pages."
-          />
+          <Maps path="/maps" />
+          <Info path="/info" />
         </Router>
       </main>
       <SponsorFooter />
