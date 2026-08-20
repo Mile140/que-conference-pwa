@@ -145,7 +145,17 @@ Done:
 - **Announcements** (`/admin/announcements`): compose and post new announcements in-app, list existing ones, delete. Push delivery still isn't wired up (Phase 4 follow-up), so this posts to the in-app feed only, same as before.
 - The "Admin" nav link only appears once you're signed in as admin — there's no public link to `/admin/login`, you'll need to navigate there directly the first time (bookmark it).
 
-Not yet built (still coming): content CRUD for sessions/speakers/sponsors/maps/info pages, Eventbrite import in-app, and the usage-stats dashboard (which also needs event-tracking instrumentation added throughout the app first — nothing currently writes to the `analytics_events` table).
+Also fixed two bugs found by real testing: (1) `questions(name)` / `attendees(name)` embeds were returning HTTP 300 "ambiguous relationship" — `question_votes` has FKs to both `questions` and `attendees`, creating an implicit many-to-many bridge on top of the direct FK, so PostgREST couldn't tell which relationship you meant. Fixed by hinting the exact FK (`attendees!questions_attendee_id_fkey(name)`) everywhere that embed is used, and added visible error messages instead of silently showing an empty list. (2) The public Questions page was showing hidden questions to admin viewers (correct per RLS, but confusing to test) — it now always filters out hidden questions client-side regardless of who's signed in, so it reliably shows what a real attendee sees.
+
+**Content CRUD** — in-app editing for everything content management needs:
+
+- Sessions (`/admin/sessions`): create/edit/delete, including a presenting-sponsor link. Start/end times are entered as Pacific wall-clock time and converted with the correct UTC offset automatically (handles the PDT/PST boundary correctly — verified both a September and a January date).
+- Speakers (`/admin/speakers`): search attendees, flag/unflag `is_speaker`, edit bio + photo (real upload to Storage, not paste-a-URL), sponsor-contact link, and check off which sessions they're presenting.
+- Sponsors (`/admin/sponsors`): full CRUD including logo upload.
+- Venue & Maps (`/admin/maps`) and Info Pages (`/admin/info`): full CRUD, maps support image upload direct to the `maps` Storage bucket.
+- All three image uploads (speaker photos → `avatars`, sponsor logos → `sponsor-logos`, map images → `maps`) go straight from the browser to Supabase Storage via the existing admin-all storage policy — no more manual dashboard upload + paste-URL step.
+
+Not yet built: Eventbrite import in-app (still run `scripts/import_attendees.py` yourself), and the usage-stats dashboard (needs event-tracking instrumentation added throughout the app first — nothing currently writes to the `analytics_events` table).
 
 ## App shell updates (post-Phase 4)
 

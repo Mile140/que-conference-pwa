@@ -62,7 +62,7 @@ function AdminHomeContent() {
       </section>
 
       <section class="card">
-        <h3 style={{ marginTop: 0 }}>Moderation & content</h3>
+        <h3 style={{ marginTop: 0 }}>Moderation &amp; engagement</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <RouterLink href="/admin/moderation">Moderate questions</RouterLink>
           <RouterLink href="/admin/announcements">Announcements</RouterLink>
@@ -70,10 +70,21 @@ function AdminHomeContent() {
       </section>
 
       <section class="card">
+        <h3 style={{ marginTop: 0 }}>Content</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <RouterLink href="/admin/sessions">Sessions</RouterLink>
+          <RouterLink href="/admin/speakers">Speakers</RouterLink>
+          <RouterLink href="/admin/sponsors">Sponsors</RouterLink>
+          <RouterLink href="/admin/maps">Venue &amp; Maps</RouterLink>
+          <RouterLink href="/admin/info">Info Pages</RouterLink>
+        </div>
+      </section>
+
+      <section class="card">
         <p style={{ color: "var(--text-muted)", margin: 0 }}>
-          Content editing (sessions, speakers, sponsors, maps, info pages), Eventbrite import, and
-          the usage-stats dashboard aren't in the admin console yet — use the Supabase dashboard
-          directly for those in the meantime.
+          Eventbrite import and the usage-stats dashboard aren't in the admin console yet — run{" "}
+          <code>scripts/import_attendees.py</code> for attendee imports, and use the Supabase
+          dashboard directly for anything else not listed above.
         </p>
       </section>
     </>

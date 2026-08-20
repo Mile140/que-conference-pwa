@@ -31,6 +31,7 @@ export interface Session {
   materials_url: string | null;
   lab_notes: string | null;
   presenter_text: string | null;
+  sponsor_id: string | null;
   sort: number;
 }
 
@@ -65,6 +66,44 @@ export function formatDay(dayIso: string): string {
   // dayIso is a plain date ("2026-09-16"); construct at noon UTC to avoid
   // any chance of the date itself shifting a calendar day under conversion.
   return dayFormatter.format(new Date(`${dayIso}T12:00:00Z`));
+}
+
+/**
+ * Converts a `<input type="datetime-local">` value (a naive "wall clock"
+ * string, no timezone) into a full ISO 8601 string with the correct venue
+ * (Pacific) UTC offset explicitly attached -- the same footgun the original
+ * SQL import guarded against with `AT TIME ZONE 'America/Los_Angeles'`.
+ * Without an explicit offset, Postgres would interpret the naive string as
+ * UTC, silently shifting every admin-entered time by 7-8 hours.
+ */
+export function pacificWallTimeToISO(localDateTime: string): string {
+  const guess = new Date(`${localDateTime}:00Z`);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: VENUE_TIMEZONE,
+    timeZoneName: "shortOffset",
+  }).formatToParts(guess);
+  const offsetName = parts.find((p) => p.type === "timeZoneName")?.value ?? "GMT-8";
+  const match = offsetName.match(/GMT([+-]\d+)/);
+  const offsetHours = match ? parseInt(match[1], 10) : -8;
+  const sign = offsetHours <= 0 ? "-" : "+";
+  const abs = Math.abs(offsetHours).toString().padStart(2, "0");
+  return `${localDateTime}:00${sign}${abs}:00`;
+}
+
+/** Inverse of pacificWallTimeToISO -- for populating a datetime-local input from a stored ISO string. */
+export function isoToPacificDateTimeLocal(iso: string): string {
+  const d = new Date(iso);
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: VENUE_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(d);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
+  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
 }
 
 export function groupByDay(sessions: Session[]): Array<{ day: string; sessions: Session[] }> {

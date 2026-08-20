@@ -20,6 +20,11 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminHome from "./pages/admin/AdminHome";
 import AdminModeration from "./pages/admin/AdminModeration";
 import AdminAnnouncements from "./pages/admin/AdminAnnouncements";
+import AdminSessions from "./pages/admin/AdminSessions";
+import AdminSpeakers from "./pages/admin/AdminSpeakers";
+import AdminSponsors from "./pages/admin/AdminSponsors";
+import AdminMaps from "./pages/admin/AdminMaps";
+import AdminInfoPages from "./pages/admin/AdminInfoPages";
 
 export default function App() {
   return (
@@ -46,6 +51,11 @@ export default function App() {
           <AdminHome path="/admin" />
           <AdminModeration path="/admin/moderation" />
           <AdminAnnouncements path="/admin/announcements" />
+          <AdminSessions path="/admin/sessions" />
+          <AdminSpeakers path="/admin/speakers" />
+          <AdminSponsors path="/admin/sponsors" />
+          <AdminMaps path="/admin/maps" />
+          <AdminInfoPages path="/admin/info" />
         </Router>
       </main>
       <SponsorFooter />
