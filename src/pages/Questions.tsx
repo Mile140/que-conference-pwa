@@ -9,7 +9,7 @@ interface QuestionsProps {
 
 /** Day-3 discussion questions (spec §3.6): public read, verified submit + upvote. */
 export default function Questions(_props: QuestionsProps) {
-  const { questions, voteCounts, myVotes, loading, submit, toggleVote } = useQuestions();
+  const { questions, voteCounts, myVotes, loading, error: loadError, submit, toggleVote } = useQuestions();
   const { settings } = useSettings();
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +66,8 @@ export default function Questions(_props: QuestionsProps) {
       </section>
 
       {loading && <p>Loading questions…</p>}
-      {!loading && questions.length === 0 && (
+      {loadError && <p style={{ color: "crimson" }}>Couldn't load questions: {loadError}</p>}
+      {!loading && !loadError && questions.length === 0 && (
         <p style={{ color: "var(--text-muted)" }}>No questions submitted yet.</p>
       )}
 

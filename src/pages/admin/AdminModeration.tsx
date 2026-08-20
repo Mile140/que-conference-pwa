@@ -25,14 +25,20 @@ export default function AdminModeration(_props: AdminModerationProps) {
 function AdminModerationContent() {
   const [questions, setQuestions] = useState<ModeratedQuestion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   async function load() {
     // Admins see hidden questions too (RLS: (NOT hidden) OR is_admin()).
-    const { data, error } = await supabase
+    // "attendees!questions_attendee_id_fkey" disambiguates the embed --
+    // question_votes has FKs to both questions and attendees, which creates
+    // an implicit many-to-many bridge on top of this table's own direct FK,
+    // so plain `attendees(name)` is ambiguous to PostgREST (HTTP 300).
+    const { data, error: err } = await supabase
       .from("questions")
-      .select("id, body, created_at, hidden, attendees(name)")
+      .select("id, body, created_at, hidden, attendees!questions_attendee_id_fkey(name)")
       .order("created_at", { ascending: false });
-    if (error) console.error("Failed to load questions for moderation", error);
+    if (err) console.error("Failed to load questions for moderation", err);
+    setError(err?.message ?? null);
     setQuestions((data as unknown as ModeratedQuestion[]) ?? []);
     setLoading(false);
   }
@@ -57,7 +63,8 @@ function AdminModerationContent() {
       </section>
 
       {loading && <p>Loading…</p>}
-      {!loading && questions.length === 0 && <p style={{ color: "var(--text-muted)" }}>No questions yet.</p>}
+      {error && <p style={{ color: "crimson" }}>Couldn't load questions: {error}</p>}
+      {!loading && !error && questions.length === 0 && <p style={{ color: "var(--text-muted)" }}>No questions yet.</p>}
 
       {questions.map((q) => (
         <div class="card" key={q.id} style={{ opacity: q.hidden ? 0.6 : 1 }}>
