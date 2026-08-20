@@ -57,7 +57,7 @@ export function formatTime(iso: string): string {
   return timeFormatter.format(new Date(iso));
 }
 
-export function formatTimeRange(session: Session): string {
+export function formatTimeRange(session: { start: string; end: string }): string {
   return `${formatTime(session.start)} – ${formatTime(session.end)}`;
 }
 

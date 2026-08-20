@@ -103,10 +103,29 @@ Done:
 
 Deliberately deferred (by your choice, to de-risk this phase): **push notifications**. The `push_subscriptions` table and `agenda_items.remind` column exist from Phase 1, but there's no opt-in UI, VAPID keypair, edge function, or reminder cron yet — announcements and any future reminders are in-app/Realtime only for now. This is real new infrastructure (service worker push handling, a Supabase Edge Function to send pushes, a cron job for pre-session reminders) and is scoped as its own follow-up rather than bundled here.
 
-Not yet built: photo wall (Phase 8), speaker photo/bio linking + real presenter records (Phase 5), push notification delivery (follow-up to Phase 4).
+Not yet built: photo wall (Phase 8), push notification delivery (follow-up to Phase 4).
+
+## Project status — Phase 5: Sponsors, Speakers & Branding
+
+Done:
+
+- Speakers page (`/speakers`): lists attendees flagged `is_speaker`, each with photo/bio/company, their linked sessions (via a new `session_speakers` join table — this table, its RLS, and `attendees.sponsor_id` already existed unused in the schema since Phase 1), and a link to their sponsor's page if they're also a sponsor contact.
+- Sponsors page (`/sponsors`) and sponsor detail pages (`/sponsors/:id`): logo, description, website, contact, "what they're sponsoring," and any sessions they're presenting (new `sessions.sponsor_id` column).
+- Rotating footer now links to the sponsor's detail page instead of just displaying inert text.
+- MikeCarey.Tech is seeded as a real sponsor row (not placeholder — its description is fixed spec content) so the "built & provided by" credit has somewhere real to link to.
+
+**Content still needed from you** — the code is ready but the data isn't:
+
+- No attendees are flagged `is_speaker` yet, so `/speakers` is currently empty. Flag them in Supabase (`attendees.is_speaker = true`) as speakers are confirmed.
+- No real event sponsors loaded yet (only the seeded MikeCarey.Tech row exists) — add rows to `sponsors` (name, logo_url, description, website, contact, sponsoring_text, display_order) as you get them.
+- Neither `session_speakers` nor `sessions.sponsor_id` / `attendees.sponsor_id` are populated — once speakers/sponsors are flagged, link them to their actual sessions the same way (direct SQL or the Supabase table editor, until the Phase 7 admin console exists).
 
 ## App shell updates (post-Phase 4)
 
 - **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".
 - **Build version:** the footer shows `v<build-date>-<git-short-hash>` (e.g. `v2026-08-20-03c9bb9`), computed at build time in `vite.config.ts` via `git rev-parse --short HEAD`. Useful for confirming which deploy you're actually looking at.
 - **Update-available banner:** the PWA's `registerType` changed from `autoUpdate` to `prompt` — a new service worker now installs in the background and waits, rather than silently taking over. When one's ready, a banner appears at the top of the app ("A new version of the app is available" + Refresh button); clicking it activates the new version and reloads. See `src/lib/updateSW.ts` / `src/components/UpdateBanner.tsx`.
+
+## Backlog (not scheduled to a phase yet)
+
+- **Email myself my learning list** — button on `/learning` to send the attendee's own list to their own verified email (self-serve export/backup, not an admin or cross-attendee feature). Needs outbound email beyond Auth's built-in mailer (e.g. a Supabase Edge Function using Resend directly), so it's more than a UI-only add. Requested 2026-08-20.

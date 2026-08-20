@@ -11,6 +11,9 @@ import Questions from "./pages/Questions";
 import LearningList from "./pages/LearningList";
 import Verify from "./pages/Verify";
 import Profile from "./pages/Profile";
+import Speakers from "./pages/Speakers";
+import Sponsors from "./pages/Sponsors";
+import SponsorDetail from "./pages/SponsorDetail";
 import Stub from "./pages/Stub";
 
 export default function App() {
@@ -29,18 +32,9 @@ export default function App() {
           <LearningList path="/learning" />
           <Verify path="/verify" />
           <Profile path="/profile" />
-          <Stub
-            path="/speakers"
-            title="Speakers"
-            phase="Phase 5"
-            blurb="Everyone flagged as a speaker, with their linked sessions."
-          />
-          <Stub
-            path="/sponsors"
-            title="Sponsors"
-            phase="Phase 5"
-            blurb="Sponsor detail pages, display order, and what each sponsor is backing."
-          />
+          <Speakers path="/speakers" />
+          <Sponsors path="/sponsors" />
+          <SponsorDetail path="/sponsors/:id" />
           <Stub
             path="/maps"
             title="Venue &amp; Maps"

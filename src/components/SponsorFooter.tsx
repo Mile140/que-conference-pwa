@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "../lib/supabase";
+import RouterLink from "./RouterLink";
 
 interface Sponsor {
   id: string;
@@ -35,19 +36,21 @@ export default function SponsorFooter() {
   return (
     <footer class="app-footer">
       {sponsor && (
-        <div class="card" style={{ textAlign: "left" }}>
-          {sponsor.logo_url && (
-            <img
-              src={sponsor.logo_url}
-              alt={sponsor.name}
-              style={{ maxHeight: 32, marginBottom: 8 }}
-            />
-          )}
-          <div>
-            <strong>{sponsor.name}</strong>
-            {sponsor.sponsoring_text ? ` — ${sponsor.sponsoring_text}` : ""}
+        <RouterLink href={`/sponsors/${sponsor.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+          <div class="card" style={{ textAlign: "left" }}>
+            {sponsor.logo_url && (
+              <img
+                src={sponsor.logo_url}
+                alt={sponsor.name}
+                style={{ maxHeight: 32, marginBottom: 8 }}
+              />
+            )}
+            <div>
+              <strong>{sponsor.name}</strong>
+              {sponsor.sponsoring_text ? ` — ${sponsor.sponsoring_text}` : ""}
+            </div>
           </div>
-        </div>
+        </RouterLink>
       )}
       <div class="credit">
         Built &amp; provided by MikeCarey.Tech
