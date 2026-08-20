@@ -5,6 +5,9 @@ import SponsorFooter from "./components/SponsorFooter";
 import Home from "./pages/Home";
 import Schedule from "./pages/Schedule";
 import SessionDetail from "./pages/SessionDetail";
+import Directory from "./pages/Directory";
+import Verify from "./pages/Verify";
+import Profile from "./pages/Profile";
 import Stub from "./pages/Stub";
 
 export default function App() {
@@ -17,12 +20,9 @@ export default function App() {
           <Home path="/" />
           <Schedule path="/schedule" />
           <SessionDetail path="/schedule/:id" />
-          <Stub
-            path="/directory"
-            title="Attendee Directory"
-            phase="Phase 3"
-            blurb="Searchable directory, unlocked after passwordless email verification."
-          />
+          <Directory path="/directory" />
+          <Verify path="/verify" />
+          <Profile path="/profile" />
           <Stub
             path="/speakers"
             title="Speakers"

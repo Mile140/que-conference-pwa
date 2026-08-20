@@ -1,5 +1,7 @@
 import { useMemo, useState } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
+import { attendee, authSession } from "../lib/auth";
+import { useAgenda } from "../lib/agenda";
 import {
   formatDay,
   formatTimeRange,
@@ -15,9 +17,12 @@ interface ScheduleProps {
 
 export default function Schedule(_props: ScheduleProps) {
   const { sessions, loading, error } = useSessions();
+  const { sessionIds } = useAgenda();
   const [trackFilter, setTrackFilter] = useState("");
   const [roomFilter, setRoomFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [myAgendaOnly, setMyAgendaOnly] = useState(false);
+  const verified = authSession.value && attendee.value;
 
   const tracks = useMemo(
     () => Array.from(new Set(sessions.map((s) => s.track).filter(Boolean))) as string[],
@@ -32,7 +37,8 @@ export default function Schedule(_props: ScheduleProps) {
     (s) =>
       (!trackFilter || s.track === trackFilter) &&
       (!roomFilter || s.room === roomFilter) &&
-      (!typeFilter || s.type === typeFilter)
+      (!typeFilter || s.type === typeFilter) &&
+      (!myAgendaOnly || sessionIds.has(s.id))
   );
   const days = groupByDay(filtered);
 
@@ -69,6 +75,16 @@ export default function Schedule(_props: ScheduleProps) {
             </select>
           )}
         </div>
+        {verified && (
+          <label style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10 }}>
+            <input
+              type="checkbox"
+              checked={myAgendaOnly}
+              onChange={(e) => setMyAgendaOnly((e.target as HTMLInputElement).checked)}
+            />
+            My agenda only
+          </label>
+        )}
       </section>
 
       {loading && <p>Loading schedule…</p>}
@@ -81,8 +97,8 @@ export default function Schedule(_props: ScheduleProps) {
         <section key={day}>
           <h2>{formatDay(day)}</h2>
           {daySessions.map((s) => (
-            <RouterLink href={`/schedule/${s.id}`} key={s.id} style={{ textDecoration: "none", color: "inherit" }}>
-              <div class="card">
+            <div class="card" key={s.id} style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start" }}>
+              <RouterLink href={`/schedule/${s.id}`} style={{ textDecoration: "none", color: "inherit", flex: 1 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
                   <strong>{s.title}</strong>
                   <span class="badge-gold">{TYPE_LABELS[s.type]}</span>
@@ -91,8 +107,13 @@ export default function Schedule(_props: ScheduleProps) {
                   {formatTimeRange(s)}
                   {s.room ? ` · ${s.room}` : ""}
                 </div>
-              </div>
-            </RouterLink>
+              </RouterLink>
+              {sessionIds.has(s.id) && (
+                <span title="On my agenda" style={{ fontSize: "1.2rem" }}>
+                  ★
+                </span>
+              )}
+            </div>
           ))}
         </section>
       ))}

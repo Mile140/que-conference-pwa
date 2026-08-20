@@ -73,3 +73,22 @@ Known data gaps carried over from the source workbook (fix directly in Supabase,
 - `materials_url` is empty for every session (spec allows this — external links only, may be few or none).
 
 Not yet built: personal agenda / add-to-schedule (Phase 3, needs verified-attendee auth), session feedback control (Phase 4), speaker photo/bio linking (Phase 5).
+
+## Project status — Phase 3: Identity & Directory
+
+Done:
+
+- `scripts/import_attendees.py` — reusable Eventbrite export importer (.xlsx or .csv). Handles duplicate ticket-line rows, Eventbrite's "Info Requested" placeholder rows, and trailing "TOTALS" rows. Upserts by email; never touches fields the attendee/admin sets after import (job_title, focus_areas, contact_opt_in, etc.).
+- 39 attendees loaded from **last year's (2025)** Eventbrite export as placeholder data — replace by re-running the script against the real 2026 export once registrations open.
+- Passwordless email OTP (`/verify`): 6-digit code, no password, via Supabase Auth. First verification either claims a pre-imported attendee row (matched by email) or creates a fresh one (walk-ins not in the Eventbrite export).
+- Profile setup (`/profile`): name, company, job title/function, focus areas, contact opt-in (default on, per D18).
+- Searchable directory (`/directory`): name/company/role/focus-area search, `mailto:` "Send email" for opted-in attendees. Only visible to verified attendees (guests see a verify prompt), per spec's access tiers.
+- Personal agenda: add/remove on the session detail page and a star indicator + "My agenda only" filter on the Schedule page. No reminders yet — that's push infrastructure, Phase 4.
+- RLS fix: the original `attendees` UPDATE policy couldn't actually let anyone claim their pre-imported row (chicken-and-egg on `auth_user_id`) — patched so a verified attendee can claim an unclaimed row matching their verified email, and tightened INSERT so a self-created row must use the attendee's own verified email.
+
+Outstanding, blocking real attendee use:
+
+- **Resend SMTP not finished** — domain verification for `quegroup.mikecarey.tech` and wiring the SMTP credentials into Supabase's dashboard are manual steps only you can do (see chat). Until then, Supabase's default mailer caps at 2 emails/hour — fine for solo testing, not for real onboarding.
+- **Admin account** — needs to be created in the Supabase dashboard (Authentication → Users → Add User) and linked into the `admins` table; see chat for exact steps.
+
+Not yet built: session feedback (Phase 4), Day-3 questions/learning list/push (Phase 4), speaker photo/bio linking + real presenter records (Phase 5).

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "../lib/supabase";
+import { attendee, authSession } from "../lib/auth";
+import { useAgenda } from "../lib/agenda";
 import { formatDay, formatTimeRange, TYPE_LABELS, type Session } from "../lib/sessions";
 
 interface SessionDetailProps {
@@ -11,6 +13,8 @@ export default function SessionDetail({ id }: SessionDetailProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const { sessionIds, toggle } = useAgenda();
+  const verified = authSession.value && attendee.value;
 
   useEffect(() => {
     if (!id) return;
@@ -38,6 +42,8 @@ export default function SessionDetail({ id }: SessionDetailProps) {
   if (notFound) return <p>Session not found.</p>;
   if (!session) return null;
 
+  const inAgenda = sessionIds.has(session.id);
+
   return (
     <article class="card">
       <span class="badge-gold">{TYPE_LABELS[session.type]}</span>
@@ -46,6 +52,27 @@ export default function SessionDetail({ id }: SessionDetailProps) {
         {formatDay(session.day)} · {formatTimeRange(session)}
         {session.room ? ` · ${session.room}` : ""}
       </p>
+
+      {verified ? (
+        <button
+          type="button"
+          onClick={() => toggle(session.id)}
+          style={{
+            padding: "8px 14px",
+            marginBottom: 12,
+            background: inAgenda ? "var(--brand-accent)" : "transparent",
+            color: inAgenda ? "var(--white)" : "var(--text)",
+            border: "1px solid var(--brand-accent)",
+            borderRadius: 6,
+          }}
+        >
+          {inAgenda ? "✓ On my agenda" : "+ Add to my schedule"}
+        </button>
+      ) : (
+        <p style={{ color: "var(--text-muted)" }}>
+          <a href="/verify">Verify your email</a> to add this to your personal agenda.
+        </p>
+      )}
 
       {session.presenter_text && (
         <p>
