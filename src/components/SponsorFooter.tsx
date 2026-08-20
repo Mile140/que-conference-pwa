@@ -49,7 +49,10 @@ export default function SponsorFooter() {
           </div>
         </div>
       )}
-      <div class="credit">Built &amp; provided by MikeCarey.Tech</div>
+      <div class="credit">
+        Built &amp; provided by MikeCarey.Tech
+        <span style={{ opacity: 0.6 }}> · v{__APP_VERSION__}</span>
+      </div>
     </footer>
   );
 }

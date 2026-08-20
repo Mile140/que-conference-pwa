@@ -1,12 +1,40 @@
+import { execSync } from "node:child_process";
 import { defineConfig } from "vite";
 import preact from "@preact/preset-vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+// Build identifier shown in the footer and used to tell attendees a new
+// version is available (see src/lib/updateSW.ts). Short commit hash + build
+// date; falls back to a timestamp if git isn't available (e.g. a source
+// zip rather than a clone) so the build never fails over this.
+function buildVersion(): string {
+  try {
+    const hash = execSync("git rev-parse --short HEAD").toString().trim();
+    const date = new Date().toISOString().slice(0, 10);
+    return `${date}-${hash}`;
+  } catch {
+    return new Date().toISOString().slice(0, 16).replace("T", "-");
+  }
+}
+
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(buildVersion())
+  },
   plugins: [
     preact(),
     VitePWA({
-      registerType: "autoUpdate",
+      // "prompt" (not autoUpdate): a new service worker installs in the
+      // background but waits for the user to confirm via the in-app
+      // "Update available" banner (src/components/UpdateBanner.tsx) before
+      // activating -- avoids yanking content out from under someone
+      // mid-session, and matches the Project Board PWA's update pattern.
+      registerType: "prompt",
+      // We register the service worker ourselves via `virtual:pwa-register`
+      // (src/lib/updateSW.ts) to get the onNeedRefresh callback that drives
+      // the banner -- disable the plugin's own auto-injected register
+      // script so it isn't registered twice.
+      injectRegister: null,
       includeAssets: ["favicon.svg"],
       // TODO(Phase 1 follow-up): swap the placeholder favicon.svg for the real
       // MikeCarey.Tech-branded logo (spec §4.1) and add proper 192/512 PNG

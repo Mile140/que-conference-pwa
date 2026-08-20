@@ -7,7 +7,12 @@ export default function Header() {
 
   return (
     <header class="app-header">
-      <span class="brand">QUE Group Conference</span>
+      <span class="brand" style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+        <span>2026 QUE Group Conference</span>
+        <span style={{ fontSize: "0.7rem", fontWeight: 400, opacity: 0.85 }}>
+          San Diego, CA · Sep 16–18, 2026
+        </span>
+      </span>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <RouterLink
           href={verified ? "/profile" : "/verify"}

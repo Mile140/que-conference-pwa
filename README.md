@@ -104,3 +104,9 @@ Done:
 Deliberately deferred (by your choice, to de-risk this phase): **push notifications**. The `push_subscriptions` table and `agenda_items.remind` column exist from Phase 1, but there's no opt-in UI, VAPID keypair, edge function, or reminder cron yet — announcements and any future reminders are in-app/Realtime only for now. This is real new infrastructure (service worker push handling, a Supabase Edge Function to send pushes, a cron job for pre-session reminders) and is scoped as its own follow-up rather than bundled here.
 
 Not yet built: photo wall (Phase 8), speaker photo/bio linking + real presenter records (Phase 5), push notification delivery (follow-up to Phase 4).
+
+## App shell updates (post-Phase 4)
+
+- **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".
+- **Build version:** the footer shows `v<build-date>-<git-short-hash>` (e.g. `v2026-08-20-03c9bb9`), computed at build time in `vite.config.ts` via `git rev-parse --short HEAD`. Useful for confirming which deploy you're actually looking at.
+- **Update-available banner:** the PWA's `registerType` changed from `autoUpdate` to `prompt` — a new service worker now installs in the background and waits, rather than silently taking over. When one's ready, a banner appears at the top of the app ("A new version of the app is available" + Refresh button); clicking it activates the new version and reloads. See `src/lib/updateSW.ts` / `src/components/UpdateBanner.tsx`.
