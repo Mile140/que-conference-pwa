@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import AdminGuard from "../../components/AdminGuard";
+import PageHero from "../../components/PageHero";
 import { supabase } from "../../lib/supabase";
 import { useSponsors } from "../../lib/sponsors";
 import {
@@ -88,12 +89,15 @@ function AdminSessionsContent() {
 
   return (
     <>
-      <section class="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0 }}>Sessions</h2>
-        <button type="button" onClick={() => setCreating(true)} style={{ padding: "6px 12px" }}>
-          + Add session
-        </button>
-      </section>
+      <PageHero
+        eyebrow="Admin"
+        title="Sessions"
+        action={
+          <button type="button" class="btn-gold" onClick={() => setCreating(true)} style={{ padding: "6px 14px" }}>
+            + Add session
+          </button>
+        }
+      />
 
       {creating && (
         <SessionForm
@@ -307,7 +311,7 @@ function SessionForm({
       </div>
       {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
       <div style={{ display: "flex", gap: 8 }}>
-        <button type="submit" disabled={saving} style={{ padding: "8px 14px" }}>
+        <button type="submit" class="btn-gold" disabled={saving}>
           {saving ? "Saving…" : "Save"}
         </button>
         <button type="button" onClick={onCancel} style={{ padding: "8px 14px" }}>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import AdminGuard from "../../components/AdminGuard";
+import PageHero from "../../components/PageHero";
 import { supabase } from "../../lib/supabase";
 
 interface AdminModerationProps {
@@ -58,9 +59,7 @@ function AdminModerationContent() {
 
   return (
     <>
-      <section class="card">
-        <h2 style={{ marginTop: 0, marginBottom: 0 }}>Moderate Questions</h2>
-      </section>
+      <PageHero eyebrow="Admin" title="Moderate questions" />
 
       {loading && <p>Loading…</p>}
       {error && <p style={{ color: "crimson" }}>Couldn't load questions: {error}</p>}

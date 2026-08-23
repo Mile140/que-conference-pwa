@@ -1,5 +1,6 @@
 import { useState } from "preact/hooks";
 import { route } from "preact-router";
+import PageHero from "../../components/PageHero";
 import { authSession, isAdmin, signInAdminPassword } from "../../lib/auth";
 
 interface AdminLoginProps {
@@ -31,30 +32,32 @@ export default function AdminLogin(_props: AdminLoginProps) {
   }
 
   return (
-    <section class="card" style={{ maxWidth: 360, margin: "0 auto" }}>
-      <h2 style={{ marginTop: 0 }}>Admin Sign In</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <input
-          type="email"
-          value={email}
-          onInput={(e) => setEmail((e.target as HTMLInputElement).value)}
-          placeholder="Email"
-          autocomplete="username"
-          style={{ padding: 10 }}
-        />
-        <input
-          type="password"
-          value={password}
-          onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
-          placeholder="Password"
-          autocomplete="current-password"
-          style={{ padding: 10 }}
-        />
-        {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-        <button type="submit" disabled={submitting || !email || !password} style={{ padding: "8px 14px" }}>
-          {submitting ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
-    </section>
+    <>
+      <PageHero eyebrow="2026 QUE Group Conference" title="Admin sign in" />
+      <section class="card" style={{ maxWidth: 360, margin: "0 auto" }}>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <input
+            type="email"
+            value={email}
+            onInput={(e) => setEmail((e.target as HTMLInputElement).value)}
+            placeholder="Email"
+            autocomplete="username"
+            style={{ padding: 10 }}
+          />
+          <input
+            type="password"
+            value={password}
+            onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
+            placeholder="Password"
+            autocomplete="current-password"
+            style={{ padding: 10 }}
+          />
+          {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
+          <button type="submit" class="btn-gold" disabled={submitting || !email || !password}>
+            {submitting ? "Signing in…" : "Sign in"}
+          </button>
+        </form>
+      </section>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import AdminGuard from "../../components/AdminGuard";
+import PageHero from "../../components/PageHero";
 import { supabase } from "../../lib/supabase";
 import { uploadImage } from "../../lib/storageUpload";
 import type { VenueMap } from "../../lib/venueMaps";
@@ -54,12 +55,15 @@ function AdminMapsContent() {
 
   return (
     <>
-      <section class="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0 }}>Venue &amp; Maps</h2>
-        <button type="button" onClick={() => setCreating(true)} style={{ padding: "6px 12px" }}>
-          + Add map
-        </button>
-      </section>
+      <PageHero
+        eyebrow="Admin"
+        title="Venue & maps"
+        action={
+          <button type="button" class="btn-gold" onClick={() => setCreating(true)} style={{ padding: "6px 14px" }}>
+            + Add map
+          </button>
+        }
+      />
 
       {creating && (
         <MapForm
@@ -203,7 +207,7 @@ function MapForm({
 
       {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
       <div style={{ display: "flex", gap: 8 }}>
-        <button type="submit" disabled={saving} style={{ padding: "8px 14px" }}>
+        <button type="submit" class="btn-gold" disabled={saving}>
           {saving ? "Saving…" : "Save"}
         </button>
         <button type="button" onClick={onCancel} style={{ padding: "8px 14px" }}>

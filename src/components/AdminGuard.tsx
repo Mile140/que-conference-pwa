@@ -1,4 +1,5 @@
 import type { ComponentChildren } from "preact";
+import PageHero from "./PageHero";
 import { authSession, isAdmin } from "../lib/auth";
 
 /**
@@ -13,12 +14,15 @@ export default function AdminGuard({ children }: { children: ComponentChildren }
 
   if (!authSession.value || !isAdmin.value) {
     return (
-      <section class="card">
-        <h2 style={{ marginTop: 0 }}>Admin</h2>
-        <p>
-          <a href="/admin/login">Sign in</a> with your admin account to continue.
-        </p>
-      </section>
+      <PageHero
+        eyebrow="2026 QUE Group Conference"
+        title="Admin"
+        subtitle={
+          <>
+            <a href="/admin/login">Sign in</a> with your admin account to continue.
+          </>
+        }
+      />
     );
   }
 

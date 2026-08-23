@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import AdminGuard from "../../components/AdminGuard";
+import PageHero from "../../components/PageHero";
 import { supabase } from "../../lib/supabase";
 import { uploadImage } from "../../lib/storageUpload";
 import { useSponsors } from "../../lib/sponsors";
@@ -75,12 +76,13 @@ function AdminSpeakersContent() {
 
   return (
     <>
+      <PageHero
+        eyebrow="Admin"
+        title="Speakers"
+        subtitle="Flag attendees as speakers, then edit their bio/photo, sponsor link, and which sessions they're presenting."
+      />
+
       <section class="card">
-        <h2 style={{ marginTop: 0 }}>Speakers</h2>
-        <p style={{ color: "var(--text-muted)", marginTop: 0 }}>
-          Flag attendees as speakers, then edit their bio/photo, sponsor link, and which sessions
-          they're presenting.
-        </p>
         <input
           type="search"
           placeholder="Search attendees by name, email, or company…"
@@ -247,7 +249,7 @@ function SpeakerEditor({
       </div>
 
       {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-      <button type="button" onClick={handleSave} disabled={saving} style={{ padding: "8px 14px", alignSelf: "flex-start" }}>
+      <button type="button" class="btn-gold" onClick={handleSave} disabled={saving} style={{ alignSelf: "flex-start" }}>
         {saving ? "Saving…" : "Save profile"}
       </button>
     </div>

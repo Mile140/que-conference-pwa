@@ -1,5 +1,6 @@
 import AdminGuard from "../../components/AdminGuard";
 import RouterLink from "../../components/RouterLink";
+import PageHero from "../../components/PageHero";
 import { signOut } from "../../lib/auth";
 import { useSettings } from "../../lib/settings";
 import { supabase } from "../../lib/supabase";
@@ -28,12 +29,15 @@ function AdminHomeContent() {
 
   return (
     <>
-      <section class="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0 }}>Admin</h2>
-        <button type="button" onClick={signOut} style={{ padding: "6px 12px" }}>
-          Sign out
-        </button>
-      </section>
+      <PageHero
+        eyebrow="2026 QUE Group Conference"
+        title="Admin"
+        action={
+          <button type="button" class="hero-ghost-btn" onClick={signOut}>
+            Sign out
+          </button>
+        }
+      />
 
       <section class="card">
         <h3 style={{ marginTop: 0 }}>Global toggles</h3>

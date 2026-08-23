@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import AdminGuard from "../../components/AdminGuard";
+import PageHero from "../../components/PageHero";
 import { supabase } from "../../lib/supabase";
 import type { PhotoRow, PhotoCommentRow } from "../../lib/photos";
 
@@ -48,9 +49,7 @@ function AdminPhotosContent() {
 
   return (
     <>
-      <section class="card">
-        <h2 style={{ marginTop: 0, marginBottom: 0 }}>Moderate Photos</h2>
-      </section>
+      <PageHero eyebrow="Admin" title="Moderate photos" />
 
       {loading && <p>Loading…</p>}
       {error && <p style={{ color: "crimson" }}>Couldn't load photos: {error}</p>}

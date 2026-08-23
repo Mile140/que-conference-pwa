@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import AdminGuard from "../../components/AdminGuard";
+import PageHero from "../../components/PageHero";
 import { supabase } from "../../lib/supabase";
 
 interface AdminAnnouncementsProps {
@@ -69,13 +70,13 @@ function AdminAnnouncementsContent() {
 
   return (
     <>
+      <PageHero
+        eyebrow="Admin"
+        title="Announcements"
+        subtitle="Posts immediately to the landing-page feed and personal agendas. Push delivery isn't wired up yet (see Phase 4 notes) — everyone sees this in-app only for now, whether they have the app installed or not."
+      />
+
       <section class="card">
-        <h2 style={{ marginTop: 0 }}>Announcements</h2>
-        <p style={{ color: "var(--text-muted)", marginTop: 0 }}>
-          Posts immediately to the landing-page feed and personal agendas. Push delivery isn't
-          wired up yet (see Phase 4 notes) — everyone sees this in-app only for now, whether they
-          have the app installed or not.
-        </p>
         <form onSubmit={handlePost} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <textarea
             value={body}
@@ -85,7 +86,7 @@ function AdminAnnouncementsContent() {
             style={{ padding: 10, resize: "vertical" }}
           />
           {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-          <button type="submit" disabled={submitting || !body.trim()} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
+          <button type="submit" class="btn-gold" disabled={submitting || !body.trim()} style={{ alignSelf: "flex-start" }}>
             {submitting ? "Posting…" : "Post announcement"}
           </button>
         </form>

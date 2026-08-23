@@ -296,6 +296,17 @@ button {
   border-radius: 50%;
 }
 
+.hero-ghost-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 .app-footer {
   border-top: 1px solid var(--border);
   padding: var(--space-4);

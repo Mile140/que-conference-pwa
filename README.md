@@ -187,9 +187,10 @@ A styling pass ("bold color blocks" direction, chosen from a few mockup options)
 - Gold is now the one consistent "this is selected / interactive" color app-wide: nav active tab, question upvotes, agenda toggle, session ratings, and all primary form buttons.
 - Speakers without a photo now show initials in a gold-ringed circle instead of nothing.
 - Photos you posted yourself get a thin gold border in the photo wall grid.
-- Admin console pages were intentionally left as-is (functional, unstyled) — this pass focused on what attendees see. Happy to give the admin pages the same treatment as a follow-up if wanted.
 - One simplification from the mockups: the navy hero and the white content below it are two separate rounded blocks stacked with a gap, not one fused shape with the hero's bottom corners flowing directly into the panel. Visually very close, but much less markup to maintain across ten different pages with very different content shapes.
 - Verified clean: `tsc --noEmit` and `npm run build` both pass. No schema touched, so no advisory check needed.
+
+Follow-up pass: the admin console (`/admin/*`) got the same `PageHero` treatment on every page, plus gold primary buttons on the main action in each (sign in, add session/sponsor/map/info page, save profile, post announcement). Secondary actions (edit, delete, hide/unhide, cancel) were deliberately left as plain default buttons so the one gold action per screen stays the obvious "main" thing to click, rather than a wall of gold buttons.
 
 ## App shell updates (post-Phase 4)
 
