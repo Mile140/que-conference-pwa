@@ -16,6 +16,8 @@ import Sponsors from "./pages/Sponsors";
 import SponsorDetail from "./pages/SponsorDetail";
 import Maps from "./pages/Maps";
 import Info from "./pages/Info";
+import Photos from "./pages/Photos";
+import PhotoDetail from "./pages/PhotoDetail";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminHome from "./pages/admin/AdminHome";
 import AdminModeration from "./pages/admin/AdminModeration";
@@ -25,6 +27,7 @@ import AdminSpeakers from "./pages/admin/AdminSpeakers";
 import AdminSponsors from "./pages/admin/AdminSponsors";
 import AdminMaps from "./pages/admin/AdminMaps";
 import AdminInfoPages from "./pages/admin/AdminInfoPages";
+import AdminPhotos from "./pages/admin/AdminPhotos";
 
 export default function App() {
   return (
@@ -47,6 +50,8 @@ export default function App() {
           <SponsorDetail path="/sponsors/:id" />
           <Maps path="/maps" />
           <Info path="/info" />
+          <Photos path="/photos" />
+          <PhotoDetail path="/photos/:id" />
           <AdminLogin path="/admin/login" />
           <AdminHome path="/admin" />
           <AdminModeration path="/admin/moderation" />
@@ -56,6 +61,7 @@ export default function App() {
           <AdminSponsors path="/admin/sponsors" />
           <AdminMaps path="/admin/maps" />
           <AdminInfoPages path="/admin/info" />
+          <AdminPhotos path="/admin/photos" />
         </Router>
       </main>
       <SponsorFooter />

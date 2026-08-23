@@ -157,6 +157,19 @@ Also fixed two bugs found by real testing: (1) `questions(name)` / `attendees(na
 
 Not yet built: Eventbrite import in-app (still run `scripts/import_attendees.py` yourself), and the usage-stats dashboard (needs event-tracking instrumentation added throughout the app first — nothing currently writes to the `analytics_events` table).
 
+## Project status — Phase 8 (in progress): Photo Wall
+
+Done:
+
+- Photo wall (`/photos`): verified attendees upload event photos with an optional caption. Images are compressed client-side (Canvas API, no library) before upload — a full-size version (max 1600px, target 500KB) and a thumbnail (max 480px, target 150KB), both re-encoded as JPEG (quality 0.82, retried at 0.6 if still over target). The grid shows thumbnails; guests can browse but need to verify to upload.
+- Photo detail (`/photos/:id`): full image, caption, and a comment thread. Verified attendees can comment; guests see a "verify to comment" prompt.
+- Photo moderation (`/admin/photos`): lists every photo including hidden ones, hide/unhide per photo, and an expandable comment list per photo with its own independent hide/unhide.
+- `photos`, `photo_comments`, their RLS, and the `photos`/`avatars` Storage policies all already existed unused in the schema since Phase 1 — no migration needed this phase, just the UI and upload logic.
+- Both bug patterns found earlier in Phase 7 testing (ambiguous PostgREST embeds; admins seeing hidden content on public-facing pages) were avoided proactively here: `photos`/`photo_comments` embeds use explicit FK hints (`attendees!photos_attendee_id_fkey(name)`, `attendees!photo_comments_attendee_id_fkey(name)`), and the public hooks (`usePhotos`, `usePhotoDetail`) filter out hidden rows client-side regardless of viewer role.
+- Verified clean: `tsc --noEmit` and `npm run build` both pass, and a post-phase Supabase security advisory check turned up nothing new (only the same pre-existing accepted items: `admins` has no SELECT policy by design, `is_admin()`/`current_attendee_id()` are intentionally callable by anon/authenticated, and leaked-password-protection is still off).
+
+Not yet built (remainder of Phase 8 per spec): offline hardening beyond the existing app-shell caching, final content load once real 2026 data is in, QR code + attendee communications, go-live checklist/prep.
+
 ## App shell updates (post-Phase 4)
 
 - **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".
