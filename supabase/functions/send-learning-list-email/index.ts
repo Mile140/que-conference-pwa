@@ -14,7 +14,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const DEFAULT_FROM = "QUE Group Conference <noreply@mikecarey.tech>";
+const DEFAULT_FROM = "QUE Group Conference <noreply@quegroup.mikecarey.tech>";
 
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
