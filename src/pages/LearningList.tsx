@@ -2,6 +2,8 @@ import { useEffect, useState } from "preact/hooks";
 import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { trackEvent } from "../lib/analytics";
+import { isOnline } from "../lib/network";
+import { supabase } from "../lib/supabase";
 import { useLearningList, type LearningItem } from "../lib/learningList";
 
 interface LearningListProps {
@@ -12,10 +14,37 @@ interface LearningListProps {
 export default function LearningList(_props: LearningListProps) {
   const { items, loading, addItem, updateItem, removeItem } = useLearningList();
   const [title, setTitle] = useState("");
+  const [emailing, setEmailing] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
     trackEvent("view_learning");
   }, []);
+
+  async function handleEmailList() {
+    setEmailError(null);
+    setEmailSent(false);
+    if (!isOnline.value) {
+      setEmailError("You're offline — reconnect to email your list.");
+      return;
+    }
+    setEmailing(true);
+    const { error } = await supabase.functions.invoke("send-learning-list-email");
+    setEmailing(false);
+    if (error) {
+      let message = "Failed to send the email. Try again in a bit.";
+      try {
+        const body = await (error as { context: Response }).context.json();
+        if (body?.error) message = body.error;
+      } catch {
+        // fall back to the generic message above
+      }
+      setEmailError(message);
+      return;
+    }
+    setEmailSent(true);
+  }
 
   if (!authSession.value || !attendee.value) {
     return (
@@ -45,7 +74,24 @@ export default function LearningList(_props: LearningListProps) {
         eyebrow="2026 QUE Group Conference"
         title="My learning list"
         subtitle="Private to you — questions to ask, topics to figure out. Jot notes as you learn things from sessions or hallway chats."
+        action={
+          items.length > 0 && (
+            <button
+              type="button"
+              class="hero-ghost-btn"
+              onClick={handleEmailList}
+              disabled={emailing || !isOnline.value}
+            >
+              {emailing ? "Sending…" : isOnline.value ? "Email me this list" : "Offline"}
+            </button>
+          )
+        }
       />
+
+      {emailSent && (
+        <p style={{ color: "var(--text-muted)" }}>Sent — check your inbox (and spam folder, just in case).</p>
+      )}
+      {emailError && <p style={{ color: "crimson" }}>{emailError}</p>}
 
       <section class="card">
         <form onSubmit={handleAdd} style={{ display: "flex", gap: 8 }}>

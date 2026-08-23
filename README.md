@@ -217,6 +217,17 @@ Done:
 
 Not yet built: any historical/trend view (this is current totals only, not a day-over-day chart) — flag if you want that for a future event.
 
+## Project status — Email my learning list
+
+Done (closes the backlog item from 2026-08-20):
+
+- New Edge Function `supabase/functions/send-learning-list-email`: emails a verified attendee their own learning list (each item's title/question and notes/answer, plus done status) via the Resend API. It derives the attendee strictly from the caller's own JWT — never from anything the client sends — so there's no way to trigger this for anyone but yourself.
+- "Email me this list" button on `/learning` (only shown once you have at least one item), with offline guard and a clear success/error message.
+- **Setup required before this actually sends anything** — two Edge Function secrets, set directly in the Supabase dashboard (Project Settings → Edge Functions → `send-learning-list-email` → Secrets) or via `supabase secrets set` in your own terminal, never pasted into chat:
+  - `RESEND_API_KEY` — the same Resend account already sending OTP emails. If you don't have the raw key handy, Resend's dashboard (API Keys page) can issue a new one.
+  - `LEARNING_LIST_FROM_EMAIL` — optional; defaults to `QUE Group Conference <noreply@mikecarey.tech>` if unset. Set this if you want a different verified sender address.
+- Verified clean: `tsc --noEmit` and `npm run build` both pass (the function lives outside `src/`, so it's not part of the frontend type-check — Deno's own runtime types apply there instead). Function deployed and active on the project.
+
 ## App shell updates (post-Phase 4)
 
 - **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".
@@ -225,4 +236,4 @@ Not yet built: any historical/trend view (this is current totals only, not a day
 
 ## Backlog (not scheduled to a phase yet)
 
-- **Email myself my learning list** — button on `/learning` to send the attendee's own list to their own verified email (self-serve export/backup, not an admin or cross-attendee feature). Needs outbound email beyond Auth's built-in mailer (e.g. a Supabase Edge Function using Resend directly), so it's more than a UI-only add. Requested 2026-08-20.
+_(empty for now)_
