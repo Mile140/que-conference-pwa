@@ -70,6 +70,7 @@ function AdminHomeContent() {
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <RouterLink href="/admin/moderation">Moderate questions</RouterLink>
           <RouterLink href="/admin/photos">Moderate photos</RouterLink>
+          <RouterLink href="/admin/feedback">Feedback</RouterLink>
           <RouterLink href="/admin/announcements">Announcements</RouterLink>
         </div>
       </section>

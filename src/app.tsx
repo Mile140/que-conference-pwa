@@ -19,6 +19,7 @@ import Maps from "./pages/Maps";
 import Info from "./pages/Info";
 import Photos from "./pages/Photos";
 import PhotoDetail from "./pages/PhotoDetail";
+import Feedback from "./pages/Feedback";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminHome from "./pages/admin/AdminHome";
 import AdminModeration from "./pages/admin/AdminModeration";
@@ -29,6 +30,7 @@ import AdminSponsors from "./pages/admin/AdminSponsors";
 import AdminMaps from "./pages/admin/AdminMaps";
 import AdminInfoPages from "./pages/admin/AdminInfoPages";
 import AdminPhotos from "./pages/admin/AdminPhotos";
+import AdminFeedback from "./pages/admin/AdminFeedback";
 
 export default function App() {
   return (
@@ -54,6 +56,7 @@ export default function App() {
           <Info path="/info" />
           <Photos path="/photos" />
           <PhotoDetail path="/photos/:id" />
+          <Feedback path="/feedback" />
           <AdminLogin path="/admin/login" />
           <AdminHome path="/admin" />
           <AdminModeration path="/admin/moderation" />
@@ -64,6 +67,7 @@ export default function App() {
           <AdminMaps path="/admin/maps" />
           <AdminInfoPages path="/admin/info" />
           <AdminPhotos path="/admin/photos" />
+          <AdminFeedback path="/admin/feedback" />
         </Router>
       </main>
       <SponsorFooter />

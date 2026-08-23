@@ -192,6 +192,20 @@ A styling pass ("bold color blocks" direction, chosen from a few mockup options)
 
 Follow-up pass: the admin console (`/admin/*`) got the same `PageHero` treatment on every page, plus gold primary buttons on the main action in each (sign in, add session/sponsor/map/info page, save profile, post announcement). Secondary actions (edit, delete, hide/unhide, cancel) were deliberately left as plain default buttons so the one gold action per screen stays the obvious "main" thing to click, rather than a wall of gold buttons.
 
+## Project status — Feedback + attendee comms
+
+Done:
+
+- **In-app feedback** (`/feedback`, verified attendees only): a private "report an issue" form that goes straight to the organizers — not shown to anyone else, not a public thread like Questions. New `issue_reports` table: attendees can insert their own reports; only admins can read or resolve them (`/admin/feedback`), which lists reports newest-first with a resolved/unresolved toggle and a "show resolved" filter.
+- Added to the main nav (`Feedback`) and the admin home page's moderation section.
+- Verified clean: `tsc --noEmit`, `npm run build`, and a post-migration security advisory check (nothing new — same pre-existing accepted items as always).
+
+Attendee communications (for go-live, delivered as files, not built into the app):
+
+- `QUE-2026-App-QR.png` — QR code encoding `https://quegroup.mikecarey.tech`, navy-on-white to match the brand palette, high error-correction so it still scans if a logo overlaps it later.
+- `QUE-2026-Attendee-Setup-Email.docx` — draft pre-conference email: what the app is, step-by-step setup (open the link, add to home screen on iPhone/Android, verify by email/OTP), and why verifying is worth it. Yours to send from your own email — nothing here sends on your behalf.
+- `QUE-2026-Signage.docx` — two-page print-ready flyer: a full page for the registration table (QR + setup steps + benefits), and a second page with four smaller QR signs (cut-apart, dashed guides) sized for conference room doors.
+
 ## App shell updates (post-Phase 4)
 
 - **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".

@@ -11,7 +11,8 @@ const LINKS: Array<{ href: string; label: string }> = [
   { href: "/sponsors", label: "Sponsors" },
   { href: "/photos", label: "Photos" },
   { href: "/maps", label: "Maps" },
-  { href: "/info", label: "Info" }
+  { href: "/info", label: "Info" },
+  { href: "/feedback", label: "Feedback" }
 ];
 
 export default function Nav() {
