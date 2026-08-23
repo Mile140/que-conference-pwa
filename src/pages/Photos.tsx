@@ -1,8 +1,9 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
 import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { isOnline } from "../lib/network";
+import { trackEvent } from "../lib/analytics";
 import { usePhotos, submitPhoto } from "../lib/photos";
 
 interface PhotosProps {
@@ -13,6 +14,10 @@ export default function Photos(_props: PhotosProps) {
   const { photos, loading, error } = usePhotos();
   const verified = authSession.value && attendee.value;
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    trackEvent("view_photos");
+  }, []);
 
   return (
     <>

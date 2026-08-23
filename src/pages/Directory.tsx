@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { supabase } from "../lib/supabase";
+import { trackEvent } from "../lib/analytics";
 
 interface DirectoryProps {
   path?: string;
@@ -29,6 +30,10 @@ export default function Directory(_props: DirectoryProps) {
   const [entries, setEntries] = useState<DirectoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+
+  useEffect(() => {
+    trackEvent("view_directory");
+  }, []);
 
   useEffect(() => {
     supabase

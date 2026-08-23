@@ -4,6 +4,7 @@ import { attendee, authSession } from "../lib/auth";
 import { useAgenda } from "../lib/agenda";
 import { useFeedback } from "../lib/feedback";
 import { isOnline } from "../lib/network";
+import { trackEvent } from "../lib/analytics";
 import { useSettings } from "../lib/settings";
 import { formatDay, formatTimeRange, TYPE_LABELS, type Session } from "../lib/sessions";
 
@@ -20,6 +21,10 @@ export default function SessionDetail({ id }: SessionDetailProps) {
   const { rating, rate } = useFeedback(session?.id);
   const { settings } = useSettings();
   const verified = authSession.value && attendee.value;
+
+  useEffect(() => {
+    if (id) trackEvent("view_session", id);
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;

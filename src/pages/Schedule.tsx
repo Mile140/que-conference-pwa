@@ -1,8 +1,9 @@
-import { useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
 import CachedBanner from "../components/CachedBanner";
 import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
+import { trackEvent } from "../lib/analytics";
 import { useAgenda } from "../lib/agenda";
 import {
   formatDay,
@@ -25,6 +26,10 @@ export default function Schedule(_props: ScheduleProps) {
   const [typeFilter, setTypeFilter] = useState("");
   const [myAgendaOnly, setMyAgendaOnly] = useState(false);
   const verified = authSession.value && attendee.value;
+
+  useEffect(() => {
+    trackEvent("view_schedule");
+  }, []);
 
   const tracks = useMemo(
     () => Array.from(new Set(sessions.map((s) => s.track).filter(Boolean))) as string[],

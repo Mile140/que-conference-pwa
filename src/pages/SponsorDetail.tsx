@@ -1,4 +1,6 @@
+import { useEffect } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
+import { trackEvent } from "../lib/analytics";
 import { useSponsor } from "../lib/sponsors";
 import { formatDay, formatTimeRange } from "../lib/sessions";
 
@@ -9,6 +11,10 @@ interface SponsorDetailProps {
 
 export default function SponsorDetail({ id }: SponsorDetailProps) {
   const { sponsor, sessions, loading, notFound } = useSponsor(id);
+
+  useEffect(() => {
+    if (id) trackEvent("view_sponsor", id);
+  }, [id]);
 
   if (loading) return <p>Loading…</p>;
   if (notFound || !sponsor) return <p>Sponsor not found.</p>;

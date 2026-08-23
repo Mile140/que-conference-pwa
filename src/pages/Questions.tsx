@@ -1,7 +1,8 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { isOnline } from "../lib/network";
+import { trackEvent } from "../lib/analytics";
 import { useQuestions } from "../lib/questions";
 import { useSettings } from "../lib/settings";
 
@@ -17,6 +18,10 @@ export default function Questions(_props: QuestionsProps) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const verified = authSession.value && attendee.value;
+
+  useEffect(() => {
+    trackEvent("view_questions");
+  }, []);
 
   async function handleSubmit(e: Event) {
     e.preventDefault();

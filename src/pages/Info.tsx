@@ -1,5 +1,7 @@
+import { useEffect } from "preact/hooks";
 import CachedBanner from "../components/CachedBanner";
 import PageHero from "../components/PageHero";
+import { trackEvent } from "../lib/analytics";
 import { useInfoPages } from "../lib/infoPages";
 
 interface InfoProps {
@@ -8,6 +10,10 @@ interface InfoProps {
 
 export default function Info(_props: InfoProps) {
   const { pages, loading, stale } = useInfoPages();
+
+  useEffect(() => {
+    trackEvent("view_info");
+  }, []);
 
   return (
     <>

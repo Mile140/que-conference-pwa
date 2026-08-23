@@ -1,7 +1,8 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { isOnline } from "../lib/network";
+import { trackEvent } from "../lib/analytics";
 import { submitIssueReport } from "../lib/issueReports";
 
 interface FeedbackProps {
@@ -15,6 +16,10 @@ export default function Feedback(_props: FeedbackProps) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    trackEvent("view_feedback");
+  }, []);
 
   if (!verified) {
     return (

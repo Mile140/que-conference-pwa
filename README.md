@@ -206,6 +206,17 @@ Attendee communications (for go-live, delivered as files, not built into the app
 - `QUE-2026-Attendee-Setup-Email.docx` — draft pre-conference email: what the app is, step-by-step setup (open the link, add to home screen on iPhone/Android, verify by email/OTP), and why verifying is worth it. Yours to send from your own email — nothing here sends on your behalf.
 - `QUE-2026-Signage.docx` — two-page print-ready flyer: a full page for the registration table (QR + setup steps + benefits), and a second page with four smaller QR signs (cut-apart, dashed guides) sized for conference room doors.
 
+## Project status — Usage stats dashboard
+
+Done:
+
+- `src/lib/analytics.ts`: `trackEvent(eventType, targetId?)` fires a lightweight, fire-and-forget insert into `analytics_events` (unused since Phase 1 — RLS was already set up right: anyone can insert, only admins can read). Every attendee-facing page calls it on mount (`view_home`, `view_schedule`, `view_directory`, etc.); session, sponsor, and photo detail pages also pass the row's id so views can be attributed to a specific session/sponsor/photo.
+- `/admin/stats`: attendee counts (imported vs. verified), engagement counts pulled directly from their source tables (questions, upvotes, photos, photo comments, learning-list items, session ratings, announcements, feedback reports), a page-view breakdown by page, and top-5 most-viewed sessions and sponsors.
+- Page-view aggregation happens client-side over the most recent 5,000 events rather than a server-side `GROUP BY` — plenty for this event's scale (dozens of attendees), and avoids adding a database view/function for it. Worth revisiting if this gets reused for a much larger event.
+- Verified clean: `tsc --noEmit` and `npm run build` both pass. No schema change this pass (the table and its RLS already existed correctly), so no advisory check needed.
+
+Not yet built: any historical/trend view (this is current totals only, not a day-over-day chart) — flag if you want that for a future event.
+
 ## App shell updates (post-Phase 4)
 
 - **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".

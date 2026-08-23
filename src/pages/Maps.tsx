@@ -1,5 +1,7 @@
+import { useEffect } from "preact/hooks";
 import CachedBanner from "../components/CachedBanner";
 import PageHero from "../components/PageHero";
+import { trackEvent } from "../lib/analytics";
 import { useVenueMaps } from "../lib/venueMaps";
 
 interface MapsProps {
@@ -13,6 +15,10 @@ function typeLabel(type: string | null): string | null {
 
 export default function Maps(_props: MapsProps) {
   const { maps, loading, stale } = useVenueMaps();
+
+  useEffect(() => {
+    trackEvent("view_maps");
+  }, []);
 
   return (
     <>

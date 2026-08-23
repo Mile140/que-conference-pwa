@@ -1,6 +1,8 @@
+import { useEffect } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
 import CachedBanner from "../components/CachedBanner";
 import PageHero from "../components/PageHero";
+import { trackEvent } from "../lib/analytics";
 import { useSponsors } from "../lib/sponsors";
 
 interface SponsorsProps {
@@ -9,6 +11,10 @@ interface SponsorsProps {
 
 export default function Sponsors(_props: SponsorsProps) {
   const { sponsors, loading, stale } = useSponsors();
+
+  useEffect(() => {
+    trackEvent("view_sponsors");
+  }, []);
 
   return (
     <>

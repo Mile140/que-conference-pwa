@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { supabase } from "../lib/supabase";
 import RouterLink from "../components/RouterLink";
 import PageHero from "../components/PageHero";
+import { trackEvent } from "../lib/analytics";
 import {
   formatTimeRange,
   partitionNowNext,
@@ -83,6 +84,10 @@ function NowNext() {
 export default function Home(_props: HomeProps) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    trackEvent("view_home");
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

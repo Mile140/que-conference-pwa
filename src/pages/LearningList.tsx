@@ -1,6 +1,7 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
+import { trackEvent } from "../lib/analytics";
 import { useLearningList, type LearningItem } from "../lib/learningList";
 
 interface LearningListProps {
@@ -11,6 +12,10 @@ interface LearningListProps {
 export default function LearningList(_props: LearningListProps) {
   const { items, loading, addItem, updateItem, removeItem } = useLearningList();
   const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    trackEvent("view_learning");
+  }, []);
 
   if (!authSession.value || !attendee.value) {
     return (

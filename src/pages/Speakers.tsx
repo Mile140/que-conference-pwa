@@ -1,6 +1,8 @@
+import { useEffect } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
 import CachedBanner from "../components/CachedBanner";
 import PageHero from "../components/PageHero";
+import { trackEvent } from "../lib/analytics";
 import { useSpeakers } from "../lib/speakers";
 import { formatDay, formatTimeRange } from "../lib/sessions";
 
@@ -16,6 +18,10 @@ function initials(name: string | null): string {
 
 export default function Speakers(_props: SpeakersProps) {
   const { speakers, loading, error, stale } = useSpeakers();
+
+  useEffect(() => {
+    trackEvent("view_speakers");
+  }, []);
 
   return (
     <>

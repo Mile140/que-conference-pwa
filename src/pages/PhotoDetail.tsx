@@ -1,6 +1,7 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { attendee, authSession } from "../lib/auth";
 import { isOnline } from "../lib/network";
+import { trackEvent } from "../lib/analytics";
 import { usePhotoDetail, submitComment } from "../lib/photos";
 
 interface PhotoDetailProps {
@@ -14,6 +15,10 @@ export default function PhotoDetail({ id }: PhotoDetailProps) {
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (id) trackEvent("view_photo", id);
+  }, [id]);
 
   if (loading) return <p>Loading…</p>;
   if (notFound || !photo) return <p>Photo not found.</p>;
