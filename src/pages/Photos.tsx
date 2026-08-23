@@ -1,5 +1,6 @@
 import { useState } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
+import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { isOnline } from "../lib/network";
 import { usePhotos, submitPhoto } from "../lib/photos";
@@ -15,22 +16,32 @@ export default function Photos(_props: PhotosProps) {
 
   return (
     <>
-      <section class="card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h2 style={{ margin: 0 }}>Photo Wall</h2>
-          {verified && (
-            <button type="button" onClick={() => setShowForm((v) => !v)} style={{ padding: "6px 12px" }}>
-              {showForm ? "Cancel" : "+ Add photo"}
+      <PageHero
+        eyebrow="2026 QUE Group Conference"
+        title="Photo wall"
+        subtitle={
+          !verified ? (
+            <>
+              <a href="/verify">Verify your email</a> to post photos and comments.
+            </>
+          ) : undefined
+        }
+        action={
+          verified && (
+            <button
+              type="button"
+              class="hero-action"
+              onClick={() => setShowForm((v) => !v)}
+              aria-label={showForm ? "Cancel" : "Add photo"}
+              title={showForm ? "Cancel" : "Add photo"}
+            >
+              {showForm ? "✕" : "+"}
             </button>
-          )}
-        </div>
-        {!verified && (
-          <p style={{ color: "var(--text-muted)", marginBottom: 0 }}>
-            <a href="/verify">Verify your email</a> to post photos and comments.
-          </p>
-        )}
+          )
+        }
+      >
         {showForm && verified && <PhotoUploadForm onDone={() => setShowForm(false)} />}
-      </section>
+      </PageHero>
 
       {loading && <p>Loading…</p>}
       {error && <p style={{ color: "crimson" }}>Couldn't load photos: {error}</p>}
@@ -39,15 +50,25 @@ export default function Photos(_props: PhotosProps) {
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10 }}>
-        {photos.map((p) => (
-          <RouterLink href={`/photos/${p.id}`} key={p.id} style={{ display: "block" }}>
-            <img
-              src={p.thumbnail_url || p.image_url}
-              alt={p.caption ?? "Conference photo"}
-              style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 8 }}
-            />
-          </RouterLink>
-        ))}
+        {photos.map((p) => {
+          const mine = attendee.value?.id === p.attendee_id;
+          return (
+            <RouterLink href={`/photos/${p.id}`} key={p.id} style={{ display: "block" }}>
+              <img
+                src={p.thumbnail_url || p.image_url}
+                alt={p.caption ?? "Conference photo"}
+                title={mine ? "Your photo" : undefined}
+                style={{
+                  width: "100%",
+                  aspectRatio: "1 / 1",
+                  objectFit: "cover",
+                  borderRadius: 8,
+                  border: mine ? "2px solid var(--brand-highlight)" : "none",
+                }}
+              />
+            </RouterLink>
+          );
+        })}
       </div>
     </>
   );
@@ -96,8 +117,8 @@ function PhotoUploadForm({ onDone }: { onDone: () => void }) {
         onInput={(e) => setCaption((e.target as HTMLInputElement).value)}
         style={{ padding: 8 }}
       />
-      {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-      <button type="submit" disabled={submitting || !file || !isOnline.value} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
+      {error && <p style={{ color: "#ffb4b4", margin: 0 }}>{error}</p>}
+      <button type="submit" class="btn-gold" disabled={submitting || !file || !isOnline.value} style={{ alignSelf: "flex-start" }}>
         {submitting ? "Compressing & uploading…" : isOnline.value ? "Post photo" : "Offline"}
       </button>
     </form>

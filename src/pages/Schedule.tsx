@@ -1,6 +1,7 @@
 import { useMemo, useState } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
 import CachedBanner from "../components/CachedBanner";
+import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { useAgenda } from "../lib/agenda";
 import {
@@ -45,6 +46,8 @@ export default function Schedule(_props: ScheduleProps) {
 
   return (
     <>
+      <PageHero eyebrow="2026 QUE Group Conference" title="Schedule" />
+
       <section class="card">
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <select value={typeFilter} onChange={(e) => setTypeFilter((e.target as HTMLSelectElement).value)}>
@@ -99,23 +102,23 @@ export default function Schedule(_props: ScheduleProps) {
         <section key={day}>
           <h2>{formatDay(day)}</h2>
           {daySessions.map((s) => (
-            <div class="card" key={s.id} style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start" }}>
-              <RouterLink href={`/schedule/${s.id}`} style={{ textDecoration: "none", color: "inherit", flex: 1 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+            <RouterLink href={`/schedule/${s.id}`} key={s.id} style={{ textDecoration: "none", color: "inherit" }}>
+              <div class="session-row" title={TYPE_LABELS[s.type]}>
+                <div class={`session-bar session-bar-${s.type}`} />
+                <div style={{ flex: 1 }}>
                   <strong>{s.title}</strong>
-                  <span class="badge-gold">{TYPE_LABELS[s.type]}</span>
+                  <div style={{ color: "var(--text-muted)", marginTop: 4 }}>
+                    {formatTimeRange(s)}
+                    {s.room ? ` · ${s.room}` : ""}
+                  </div>
                 </div>
-                <div style={{ color: "var(--text-muted)", marginTop: 4 }}>
-                  {formatTimeRange(s)}
-                  {s.room ? ` · ${s.room}` : ""}
-                </div>
-              </RouterLink>
-              {sessionIds.has(s.id) && (
-                <span title="On my agenda" style={{ fontSize: "1.2rem" }}>
-                  ★
-                </span>
-              )}
-            </div>
+                {sessionIds.has(s.id) && (
+                  <span title="On my agenda" style={{ fontSize: "1.2rem", color: "var(--brand-highlight)" }}>
+                    ★
+                  </span>
+                )}
+              </div>
+            </RouterLink>
           ))}
         </section>
       ))}

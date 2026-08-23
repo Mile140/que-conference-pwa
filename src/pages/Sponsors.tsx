@@ -1,5 +1,6 @@
 import RouterLink from "../components/RouterLink";
 import CachedBanner from "../components/CachedBanner";
+import PageHero from "../components/PageHero";
 import { useSponsors } from "../lib/sponsors";
 
 interface SponsorsProps {
@@ -11,9 +12,7 @@ export default function Sponsors(_props: SponsorsProps) {
 
   return (
     <>
-      <section class="card">
-        <h2 style={{ marginTop: 0, marginBottom: 0 }}>Sponsors</h2>
-      </section>
+      <PageHero eyebrow="2026 QUE Group Conference" title="Sponsors" />
 
       {loading && <p>Loading…</p>}
       {stale && <CachedBanner />}

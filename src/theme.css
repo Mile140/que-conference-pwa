@@ -135,8 +135,9 @@ button {
 }
 
 .app-nav a.active {
-  background: var(--brand-accent);
-  color: var(--white);
+  background: var(--brand-highlight);
+  color: var(--navy);
+  font-weight: 600;
 }
 
 .card {
@@ -155,6 +156,144 @@ button {
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
+}
+
+/* Visual redesign (2026-08) -- "bold color blocks" direction: a navy hero
+   block bleeding into white/elevated content, gold as the one accent color
+   for anything interactive or "selected," left color bars instead of badges
+   for scanability in long lists. See README for the mockup writeup. */
+
+.page-hero {
+  background: var(--brand-primary);
+  color: var(--white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.page-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.hero-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-title {
+  margin: 4px 0 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.hero-sub {
+  margin-top: var(--space-2);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.hero-sub a {
+  color: var(--white);
+}
+
+.hero-action {
+  background: var(--brand-highlight);
+  color: var(--navy);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.pill-row {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  margin-top: var(--space-3);
+}
+
+.pill {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  border: none;
+  cursor: pointer;
+}
+
+.pill.active {
+  background: var(--brand-highlight);
+  color: var(--navy);
+}
+
+.btn-gold {
+  background: var(--brand-highlight);
+  color: var(--navy);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-gold:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.session-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.session-bar {
+  width: 4px;
+  align-self: stretch;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.session-bar-keynote,
+.session-bar-general_session {
+  background: var(--steel-blue);
+}
+
+.session-bar-lightning_tip,
+.session-bar-hands_on_lab {
+  background: var(--gold);
+}
+
+.session-bar-panel,
+.session-bar-meal_break {
+  background: var(--mid-blue);
+}
+
+.avatar-ring {
+  border: 2px solid var(--brand-highlight);
+  border-radius: 50%;
 }
 
 .app-footer {

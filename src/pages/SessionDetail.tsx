@@ -65,9 +65,9 @@ export default function SessionDetail({ id }: SessionDetailProps) {
           style={{
             padding: "8px 14px",
             marginBottom: 12,
-            background: inAgenda ? "var(--brand-accent)" : "transparent",
-            color: inAgenda ? "var(--white)" : "var(--text)",
-            border: "1px solid var(--brand-accent)",
+            background: inAgenda ? "var(--brand-highlight)" : "transparent",
+            color: inAgenda ? "var(--navy)" : "var(--text)",
+            border: "1px solid var(--brand-highlight)",
             borderRadius: 6,
           }}
         >
@@ -116,9 +116,9 @@ export default function SessionDetail({ id }: SessionDetailProps) {
                 title={isOnline.value ? `${n} out of 5` : "You're offline"}
                 style={{
                   padding: "6px 12px",
-                  background: rating !== null && n <= rating ? "var(--brand-accent)" : "transparent",
-                  color: rating !== null && n <= rating ? "var(--white)" : "var(--text)",
-                  border: "1px solid var(--brand-accent)",
+                  background: rating !== null && n <= rating ? "var(--brand-highlight)" : "transparent",
+                  color: rating !== null && n <= rating ? "var(--navy)" : "var(--text)",
+                  border: "1px solid var(--brand-highlight)",
                   borderRadius: 6,
                 }}
               >

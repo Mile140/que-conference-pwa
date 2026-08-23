@@ -1,4 +1,5 @@
 import { useState } from "preact/hooks";
+import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { isOnline } from "../lib/network";
 import { useQuestions } from "../lib/questions";
@@ -36,21 +37,21 @@ export default function Questions(_props: QuestionsProps) {
 
   return (
     <>
-      <section class="card">
-        <h2 style={{ marginTop: 0 }}>Day-3 Discussion Questions</h2>
-        <p style={{ color: "var(--text-muted)", marginTop: 0 }}>
-          Submit what you want covered in the group discussion, and upvote what others have asked
-          so the moderator knows what matters most.
-        </p>
+      <PageHero
+        eyebrow="2026 QUE Group Conference"
+        title="Day-3 discussion questions"
+        subtitle="Submit what you want covered in the group discussion, and upvote what others have asked so the moderator knows what matters most."
+      />
 
+      <section class="card">
         {!verified && (
-          <p style={{ color: "var(--text-muted)" }}>
+          <p style={{ color: "var(--text-muted)", margin: 0 }}>
             <a href="/verify">Verify your email</a> to submit a question or upvote.
           </p>
         )}
 
         {verified && !settings.questions_open && (
-          <p style={{ color: "var(--text-muted)" }}>Question submission is currently closed.</p>
+          <p style={{ color: "var(--text-muted)", margin: 0 }}>Question submission is currently closed.</p>
         )}
 
         {verified && settings.questions_open && (
@@ -63,7 +64,7 @@ export default function Questions(_props: QuestionsProps) {
               style={{ padding: 10, resize: "vertical" }}
             />
             {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-            <button type="submit" disabled={submitting || !body.trim() || !isOnline.value} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
+            <button type="submit" class="btn-gold" disabled={submitting || !body.trim() || !isOnline.value} style={{ alignSelf: "flex-start" }}>
               {submitting ? "Submitting…" : isOnline.value ? "Submit question" : "Offline"}
             </button>
           </form>
@@ -96,9 +97,9 @@ export default function Questions(_props: QuestionsProps) {
                 flexDirection: "column",
                 alignItems: "center",
                 padding: "6px 12px",
-                background: mine ? "var(--brand-accent)" : "transparent",
-                color: mine ? "var(--white)" : "var(--text)",
-                border: "1px solid var(--brand-accent)",
+                background: mine ? "var(--brand-highlight)" : "transparent",
+                color: mine ? "var(--navy)" : "var(--text)",
+                border: "1px solid var(--brand-highlight)",
                 borderRadius: 6,
                 minWidth: 48,
               }}

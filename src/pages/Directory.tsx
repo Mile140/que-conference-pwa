@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
+import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { supabase } from "../lib/supabase";
 
@@ -53,18 +54,23 @@ export default function Directory(_props: DirectoryProps) {
 
   if (!authSession.value || !attendee.value) {
     return (
-      <section class="card">
-        <h2 style={{ marginTop: 0 }}>Attendee Directory</h2>
-        <p>
-          Verify your email to search the directory and connect with other attendees.{" "}
-          <a href="/verify">Verify now</a>.
-        </p>
-      </section>
+      <PageHero
+        eyebrow="2026 QUE Group Conference"
+        title="Attendee directory"
+        subtitle={
+          <>
+            Verify your email to search the directory and connect with other attendees.{" "}
+            <a href="/verify">Verify now</a>.
+          </>
+        }
+      />
     );
   }
 
   return (
     <>
+      <PageHero eyebrow="2026 QUE Group Conference" title="Attendee directory" />
+
       <section class="card">
         <input
           type="search"

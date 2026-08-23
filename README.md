@@ -177,6 +177,20 @@ Offline hardening (also Phase 8):
 
 Not yet built (remainder of Phase 8 per spec): final content load once real 2026 data is in, QR code + attendee communications, go-live checklist/prep.
 
+## Visual redesign (2026-08)
+
+A styling pass ("bold color blocks" direction, chosen from a few mockup options) to move away from the plain card-only look. No schema, data, or logic changes — pure CSS/markup.
+
+- `src/theme.css`: new shared classes — `.page-hero` (navy block used at the top of most pages), `.hero-eyebrow` / `.hero-title` / `.hero-sub`, `.pill` / `.pill.active` (defined for future use, not wired up yet — see below), `.btn-gold` (the one gold-filled primary-action button style), `.session-row` / `.session-bar-{type}` (a left color bar per session type instead of a text badge, for faster scanning in long lists), `.avatar-ring` (gold ring on speaker photos/initials).
+- `src/components/PageHero.tsx`: shared component (eyebrow/title/subtitle/action/children slots) so every page's intro is consistent instead of hand-rolled per page.
+- Applied to: Now & Next, Schedule, Directory, Day-3 Questions, Learning List, Speakers, Sponsors, Maps, Info, Photo Wall. Session detail and sponsor detail pages got lighter-touch updates (gold accent on buttons/badges) rather than a full hero, since they already have a natural title via the session/sponsor name.
+- Gold is now the one consistent "this is selected / interactive" color app-wide: nav active tab, question upvotes, agenda toggle, session ratings, and all primary form buttons.
+- Speakers without a photo now show initials in a gold-ringed circle instead of nothing.
+- Photos you posted yourself get a thin gold border in the photo wall grid.
+- Admin console pages were intentionally left as-is (functional, unstyled) — this pass focused on what attendees see. Happy to give the admin pages the same treatment as a follow-up if wanted.
+- One simplification from the mockups: the navy hero and the white content below it are two separate rounded blocks stacked with a gap, not one fused shape with the hero's bottom corners flowing directly into the panel. Visually very close, but much less markup to maintain across ten different pages with very different content shapes.
+- Verified clean: `tsc --noEmit` and `npm run build` both pass. No schema touched, so no advisory check needed.
+
 ## App shell updates (post-Phase 4)
 
 - **Title & header:** browser tab title and the header brand block now read "2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026".

@@ -1,4 +1,5 @@
 import CachedBanner from "../components/CachedBanner";
+import PageHero from "../components/PageHero";
 import { useInfoPages } from "../lib/infoPages";
 
 interface InfoProps {
@@ -10,9 +11,7 @@ export default function Info(_props: InfoProps) {
 
   return (
     <>
-      <section class="card">
-        <h2 style={{ marginTop: 0, marginBottom: 0 }}>Info</h2>
-      </section>
+      <PageHero eyebrow="2026 QUE Group Conference" title="Info" />
 
       {loading && <p>Loading…</p>}
       {stale && <CachedBanner />}

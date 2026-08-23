@@ -1,5 +1,6 @@
 import RouterLink from "../components/RouterLink";
 import CachedBanner from "../components/CachedBanner";
+import PageHero from "../components/PageHero";
 import { useSpeakers } from "../lib/speakers";
 import { formatDay, formatTimeRange } from "../lib/sessions";
 
@@ -7,17 +8,22 @@ interface SpeakersProps {
   path?: string;
 }
 
+function initials(name: string | null): string {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts[parts.length - 1]?.[0] ?? "")).toUpperCase();
+}
+
 export default function Speakers(_props: SpeakersProps) {
   const { speakers, loading, error, stale } = useSpeakers();
 
   return (
     <>
-      <section class="card">
-        <h2 style={{ marginTop: 0 }}>Speakers</h2>
-        <p style={{ color: "var(--text-muted)", marginTop: 0, marginBottom: 0 }}>
-          Everyone presenting at the conference.
-        </p>
-      </section>
+      <PageHero
+        eyebrow="2026 QUE Group Conference"
+        title="Speakers"
+        subtitle="Everyone presenting at the conference."
+      />
 
       {loading && <p>Loading…</p>}
       {stale && <CachedBanner />}
@@ -28,12 +34,30 @@ export default function Speakers(_props: SpeakersProps) {
 
       {speakers.map((s) => (
         <div class="card" key={s.id} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-          {s.photo_url && (
+          {s.photo_url ? (
             <img
               src={s.photo_url}
               alt={s.name ?? ""}
-              style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+              class="avatar-ring"
+              style={{ width: 64, height: 64, objectFit: "cover", flexShrink: 0 }}
             />
+          ) : (
+            <div
+              class="avatar-ring"
+              style={{
+                width: 64,
+                height: 64,
+                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "var(--bg-elevated)",
+                color: "var(--brand-accent)",
+                fontWeight: 600,
+              }}
+            >
+              {initials(s.name)}
+            </div>
           )}
           <div style={{ flex: 1 }}>
             <strong>{s.name || "(name pending)"}</strong>

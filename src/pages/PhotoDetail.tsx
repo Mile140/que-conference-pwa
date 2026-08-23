@@ -65,7 +65,7 @@ export default function PhotoDetail({ id }: PhotoDetailProps) {
               style={{ padding: 8, resize: "vertical" }}
             />
             {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-            <button type="submit" disabled={submitting || !body.trim() || !isOnline.value} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
+            <button type="submit" class="btn-gold" disabled={submitting || !body.trim() || !isOnline.value} style={{ alignSelf: "flex-start" }}>
               {submitting ? "Posting…" : isOnline.value ? "Post comment" : "Offline"}
             </button>
           </form>

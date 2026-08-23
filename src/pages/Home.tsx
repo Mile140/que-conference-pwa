@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "../lib/supabase";
 import RouterLink from "../components/RouterLink";
+import PageHero from "../components/PageHero";
 import {
   formatTimeRange,
   partitionNowNext,
@@ -25,14 +26,14 @@ interface HomeProps {
 function SessionRow({ session }: { session: Session }) {
   return (
     <RouterLink href={`/schedule/${session.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-      <div class="card">
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+      <div class="session-row" title={TYPE_LABELS[session.type]}>
+        <div class={`session-bar session-bar-${session.type}`} />
+        <div style={{ flex: 1 }}>
           <strong>{session.title}</strong>
-          <span class="badge-gold">{TYPE_LABELS[session.type]}</span>
-        </div>
-        <div style={{ color: "var(--text-muted)", marginTop: 4 }}>
-          {formatTimeRange(session)}
-          {session.room ? ` · ${session.room}` : ""}
+          <div style={{ color: "var(--text-muted)", marginTop: 4 }}>
+            {formatTimeRange(session)}
+            {session.room ? ` · ${session.room}` : ""}
+          </div>
         </div>
       </div>
     </RouterLink>
@@ -119,12 +120,10 @@ export default function Home(_props: HomeProps) {
 
   return (
     <>
-      <section class="card">
-        <h2 style={{ marginTop: 0 }}>Now &amp; Next</h2>
-        <NowNext />
-      </section>
+      <PageHero eyebrow="2026 QUE Group Conference" title="Now & Next" />
+      <NowNext />
 
-      <section>
+      <section style={{ marginTop: 24 }}>
         <h2>Announcements</h2>
         {loading && <p>Loading…</p>}
         {!loading && announcements.length === 0 && (

@@ -1,4 +1,5 @@
 import { useState } from "preact/hooks";
+import PageHero from "../components/PageHero";
 import { attendee, authSession } from "../lib/auth";
 import { useLearningList, type LearningItem } from "../lib/learningList";
 
@@ -13,13 +14,16 @@ export default function LearningList(_props: LearningListProps) {
 
   if (!authSession.value || !attendee.value) {
     return (
-      <section class="card">
-        <h2 style={{ marginTop: 0 }}>My Learning List</h2>
-        <p>
-          <a href="/verify">Verify your email</a> to keep a private list of things you want to
-          learn at the conference.
-        </p>
-      </section>
+      <PageHero
+        eyebrow="2026 QUE Group Conference"
+        title="My learning list"
+        subtitle={
+          <>
+            <a href="/verify">Verify your email</a> to keep a private list of things you want to
+            learn at the conference.
+          </>
+        }
+      />
     );
   }
 
@@ -32,12 +36,13 @@ export default function LearningList(_props: LearningListProps) {
 
   return (
     <>
+      <PageHero
+        eyebrow="2026 QUE Group Conference"
+        title="My learning list"
+        subtitle="Private to you — questions to ask, topics to figure out. Jot notes as you learn things from sessions or hallway chats."
+      />
+
       <section class="card">
-        <h2 style={{ marginTop: 0 }}>My Learning List</h2>
-        <p style={{ color: "var(--text-muted)", marginTop: 0 }}>
-          Private to you -- questions to ask, topics to figure out. Jot notes as you learn things
-          from sessions or hallway chats.
-        </p>
         <form onSubmit={handleAdd} style={{ display: "flex", gap: 8 }}>
           <input
             type="text"
@@ -46,7 +51,7 @@ export default function LearningList(_props: LearningListProps) {
             placeholder="e.g. How do other sites handle X?"
             style={{ flex: 1, padding: 10 }}
           />
-          <button type="submit" disabled={!title.trim()} style={{ padding: "8px 14px" }}>
+          <button type="submit" class="btn-gold" disabled={!title.trim()}>
             Add
           </button>
         </form>

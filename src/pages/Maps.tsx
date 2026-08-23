@@ -1,4 +1,5 @@
 import CachedBanner from "../components/CachedBanner";
+import PageHero from "../components/PageHero";
 import { useVenueMaps } from "../lib/venueMaps";
 
 interface MapsProps {
@@ -15,9 +16,7 @@ export default function Maps(_props: MapsProps) {
 
   return (
     <>
-      <section class="card">
-        <h2 style={{ marginTop: 0, marginBottom: 0 }}>Venue &amp; Maps</h2>
-      </section>
+      <PageHero eyebrow="2026 QUE Group Conference" title="Venue & maps" />
 
       {loading && <p>Loading…</p>}
       {stale && <CachedBanner />}
