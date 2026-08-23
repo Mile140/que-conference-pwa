@@ -168,7 +168,14 @@ Done:
 - Both bug patterns found earlier in Phase 7 testing (ambiguous PostgREST embeds; admins seeing hidden content on public-facing pages) were avoided proactively here: `photos`/`photo_comments` embeds use explicit FK hints (`attendees!photos_attendee_id_fkey(name)`, `attendees!photo_comments_attendee_id_fkey(name)`), and the public hooks (`usePhotos`, `usePhotoDetail`) filter out hidden rows client-side regardless of viewer role.
 - Verified clean: `tsc --noEmit` and `npm run build` both pass, and a post-phase Supabase security advisory check turned up nothing new (only the same pre-existing accepted items: `admins` has no SELECT policy by design, `is_admin()`/`current_attendee_id()` are intentionally callable by anon/authenticated, and leaked-password-protection is still off).
 
-Not yet built (remainder of Phase 8 per spec): offline hardening beyond the existing app-shell caching, final content load once real 2026 data is in, QR code + attendee communications, go-live checklist/prep.
+Offline hardening (also Phase 8):
+
+- Real IndexedDB data cache (`src/lib/offlineCache.ts`, previously a Phase 1 stub): the read hooks for schedule, speakers, sponsors, maps, and info now write their data here on every successful load, and fall back to it if the Supabase fetch fails — so those pages show real content on a cold start with zero connection, not just whatever the service worker's HTTP cache happened to keep from the last visit.
+- Each of those pages shows a small "showing saved data from earlier" note when it's running on the cached fallback rather than a live fetch.
+- App-wide offline bar (`src/components/OfflineIndicator.tsx`) appears whenever the device has no network, so it's clear the app knows it's disconnected instead of just looking broken.
+- Actions that need a live connection — submitting or upvoting a question, uploading a photo, posting a photo comment, rating a session — are disabled with a clear "you're offline" message while offline, instead of failing silently or hanging.
+
+Not yet built (remainder of Phase 8 per spec): final content load once real 2026 data is in, QR code + attendee communications, go-live checklist/prep.
 
 ## App shell updates (post-Phase 4)
 

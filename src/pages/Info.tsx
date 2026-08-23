@@ -1,3 +1,4 @@
+import CachedBanner from "../components/CachedBanner";
 import { useInfoPages } from "../lib/infoPages";
 
 interface InfoProps {
@@ -5,7 +6,7 @@ interface InfoProps {
 }
 
 export default function Info(_props: InfoProps) {
-  const { pages, loading } = useInfoPages();
+  const { pages, loading, stale } = useInfoPages();
 
   return (
     <>
@@ -14,6 +15,7 @@ export default function Info(_props: InfoProps) {
       </section>
 
       {loading && <p>Loading…</p>}
+      {stale && <CachedBanner />}
       {!loading && pages.length === 0 && (
         <p style={{ color: "var(--text-muted)" }}>Wifi, parking, and local info will be posted here.</p>
       )}

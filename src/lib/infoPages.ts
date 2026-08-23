@@ -1,5 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "./supabase";
+import { getCached, setCached } from "./offlineCache";
+
+const CACHE_KEY = "info_pages";
 
 /**
  * Admin-editable static info pages (spec §3.12) -- wifi, hotel parking,
@@ -18,6 +21,7 @@ export interface InfoPage {
 export function useInfoPages() {
   const [pages, setPages] = useState<InfoPage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,10 +29,22 @@ export function useInfoPages() {
       .from("info_pages")
       .select("*")
       .order("sort", { ascending: true })
-      .then(({ data, error }) => {
+      .then(async ({ data, error }) => {
         if (cancelled) return;
-        if (error) console.error("Failed to load info pages", error);
-        setPages((data as InfoPage[]) ?? []);
+        if (error) {
+          console.error("Failed to load info pages", error);
+          const cached = await getCached<InfoPage[]>(CACHE_KEY);
+          if (cancelled) return;
+          if (cached) {
+            setPages(cached);
+            setStale(true);
+          }
+        } else {
+          const rows = (data as InfoPage[]) ?? [];
+          setPages(rows);
+          setStale(false);
+          setCached(CACHE_KEY, rows);
+        }
         setLoading(false);
       });
     return () => {
@@ -36,5 +52,5 @@ export function useInfoPages() {
     };
   }, []);
 
-  return { pages, loading };
+  return { pages, loading, stale };
 }

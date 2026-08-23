@@ -1,5 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "./supabase";
+import { getCached, setCached } from "./offlineCache";
+
+const CACHE_KEY = "venue_maps";
 
 /**
  * Venue/hotel/off-site maps (spec §3.11) -- uploaded images and/or text,
@@ -19,6 +22,7 @@ export interface VenueMap {
 export function useVenueMaps() {
   const [maps, setMaps] = useState<VenueMap[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,10 +30,22 @@ export function useVenueMaps() {
       .from("venue_maps")
       .select("*")
       .order("sort", { ascending: true })
-      .then(({ data, error }) => {
+      .then(async ({ data, error }) => {
         if (cancelled) return;
-        if (error) console.error("Failed to load venue maps", error);
-        setMaps((data as VenueMap[]) ?? []);
+        if (error) {
+          console.error("Failed to load venue maps", error);
+          const cached = await getCached<VenueMap[]>(CACHE_KEY);
+          if (cancelled) return;
+          if (cached) {
+            setMaps(cached);
+            setStale(true);
+          }
+        } else {
+          const rows = (data as VenueMap[]) ?? [];
+          setMaps(rows);
+          setStale(false);
+          setCached(CACHE_KEY, rows);
+        }
         setLoading(false);
       });
     return () => {
@@ -37,5 +53,5 @@ export function useVenueMaps() {
     };
   }, []);
 
-  return { maps, loading };
+  return { maps, loading, stale };
 }

@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
 import { attendee, authSession } from "../lib/auth";
+import { isOnline } from "../lib/network";
 import { usePhotos, submitPhoto } from "../lib/photos";
 
 interface PhotosProps {
@@ -64,6 +65,10 @@ function PhotoUploadForm({ onDone }: { onDone: () => void }) {
       setError("Choose a photo first.");
       return;
     }
+    if (!isOnline.value) {
+      setError("You're offline — reconnect to post a photo.");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     const { error: err } = await submitPhoto(file, caption);
@@ -92,8 +97,8 @@ function PhotoUploadForm({ onDone }: { onDone: () => void }) {
         style={{ padding: 8 }}
       />
       {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-      <button type="submit" disabled={submitting || !file} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
-        {submitting ? "Compressing & uploading…" : "Post photo"}
+      <button type="submit" disabled={submitting || !file || !isOnline.value} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
+        {submitting ? "Compressing & uploading…" : isOnline.value ? "Post photo" : "Offline"}
       </button>
     </form>
   );

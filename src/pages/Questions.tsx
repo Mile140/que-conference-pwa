@@ -1,5 +1,6 @@
 import { useState } from "preact/hooks";
 import { attendee, authSession } from "../lib/auth";
+import { isOnline } from "../lib/network";
 import { useQuestions } from "../lib/questions";
 import { useSettings } from "../lib/settings";
 
@@ -19,6 +20,10 @@ export default function Questions(_props: QuestionsProps) {
   async function handleSubmit(e: Event) {
     e.preventDefault();
     setError(null);
+    if (!isOnline.value) {
+      setError("You're offline — reconnect to submit a question.");
+      return;
+    }
     setSubmitting(true);
     const { error: err } = await submit(body);
     setSubmitting(false);
@@ -58,8 +63,8 @@ export default function Questions(_props: QuestionsProps) {
               style={{ padding: 10, resize: "vertical" }}
             />
             {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-            <button type="submit" disabled={submitting || !body.trim()} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
-              {submitting ? "Submitting…" : "Submit question"}
+            <button type="submit" disabled={submitting || !body.trim() || !isOnline.value} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
+              {submitting ? "Submitting…" : isOnline.value ? "Submit question" : "Offline"}
             </button>
           </form>
         )}
@@ -83,9 +88,9 @@ export default function Questions(_props: QuestionsProps) {
             </div>
             <button
               type="button"
-              disabled={!verified}
+              disabled={!verified || !isOnline.value}
               onClick={() => toggleVote(q.id)}
-              title={verified ? (mine ? "Remove upvote" : "Upvote") : "Verify to upvote"}
+              title={!verified ? "Verify to upvote" : !isOnline.value ? "You're offline" : mine ? "Remove upvote" : "Upvote"}
               style={{
                 display: "flex",
                 flexDirection: "column",

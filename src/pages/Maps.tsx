@@ -1,3 +1,4 @@
+import CachedBanner from "../components/CachedBanner";
 import { useVenueMaps } from "../lib/venueMaps";
 
 interface MapsProps {
@@ -10,7 +11,7 @@ function typeLabel(type: string | null): string | null {
 }
 
 export default function Maps(_props: MapsProps) {
-  const { maps, loading } = useVenueMaps();
+  const { maps, loading, stale } = useVenueMaps();
 
   return (
     <>
@@ -19,6 +20,7 @@ export default function Maps(_props: MapsProps) {
       </section>
 
       {loading && <p>Loading…</p>}
+      {stale && <CachedBanner />}
       {!loading && maps.length === 0 && (
         <p style={{ color: "var(--text-muted)" }}>Maps will be posted here closer to the event.</p>
       )}

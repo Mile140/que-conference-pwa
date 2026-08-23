@@ -1,4 +1,5 @@
 import RouterLink from "../components/RouterLink";
+import CachedBanner from "../components/CachedBanner";
 import { useSpeakers } from "../lib/speakers";
 import { formatDay, formatTimeRange } from "../lib/sessions";
 
@@ -7,7 +8,7 @@ interface SpeakersProps {
 }
 
 export default function Speakers(_props: SpeakersProps) {
-  const { speakers, loading, error } = useSpeakers();
+  const { speakers, loading, error, stale } = useSpeakers();
 
   return (
     <>
@@ -19,6 +20,7 @@ export default function Speakers(_props: SpeakersProps) {
       </section>
 
       {loading && <p>Loading…</p>}
+      {stale && <CachedBanner />}
       {error && <p style={{ color: "crimson" }}>Couldn't load speakers: {error}</p>}
       {!loading && !error && speakers.length === 0 && (
         <p style={{ color: "var(--text-muted)" }}>Speakers will be listed here as they're confirmed.</p>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
+import CachedBanner from "../components/CachedBanner";
 import { attendee, authSession } from "../lib/auth";
 import { useAgenda } from "../lib/agenda";
 import {
@@ -16,7 +17,7 @@ interface ScheduleProps {
 }
 
 export default function Schedule(_props: ScheduleProps) {
-  const { sessions, loading, error } = useSessions();
+  const { sessions, loading, error, stale } = useSessions();
   const { sessionIds } = useAgenda();
   const [trackFilter, setTrackFilter] = useState("");
   const [roomFilter, setRoomFilter] = useState("");
@@ -88,6 +89,7 @@ export default function Schedule(_props: ScheduleProps) {
       </section>
 
       {loading && <p>Loading schedule…</p>}
+      {stale && <CachedBanner />}
       {error && <p style={{ color: "crimson" }}>Couldn't load the schedule: {error}</p>}
       {!loading && !error && days.length === 0 && (
         <p style={{ color: "var(--text-muted)" }}>No sessions match those filters.</p>

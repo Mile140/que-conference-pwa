@@ -1,4 +1,5 @@
 import RouterLink from "../components/RouterLink";
+import CachedBanner from "../components/CachedBanner";
 import { useSponsors } from "../lib/sponsors";
 
 interface SponsorsProps {
@@ -6,7 +7,7 @@ interface SponsorsProps {
 }
 
 export default function Sponsors(_props: SponsorsProps) {
-  const { sponsors, loading } = useSponsors();
+  const { sponsors, loading, stale } = useSponsors();
 
   return (
     <>
@@ -15,6 +16,7 @@ export default function Sponsors(_props: SponsorsProps) {
       </section>
 
       {loading && <p>Loading…</p>}
+      {stale && <CachedBanner />}
       {!loading && sponsors.length === 0 && (
         <p style={{ color: "var(--text-muted)" }}>Sponsors will be listed here as they're confirmed.</p>
       )}

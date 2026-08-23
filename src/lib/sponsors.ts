@@ -1,5 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "./supabase";
+import { getCached, setCached } from "./offlineCache";
+
+const CACHE_KEY = "sponsors";
 
 /** Sponsors list + detail (spec §3.4). Public read (sponsors RLS allows all). */
 export interface Sponsor {
@@ -25,6 +28,7 @@ export interface SponsorSession {
 export function useSponsors() {
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,10 +36,22 @@ export function useSponsors() {
       .from("sponsors")
       .select("*")
       .order("display_order", { ascending: true })
-      .then(({ data, error }) => {
+      .then(async ({ data, error }) => {
         if (cancelled) return;
-        if (error) console.error("Failed to load sponsors", error);
-        setSponsors((data as Sponsor[]) ?? []);
+        if (error) {
+          console.error("Failed to load sponsors", error);
+          const cached = await getCached<Sponsor[]>(CACHE_KEY);
+          if (cancelled) return;
+          if (cached) {
+            setSponsors(cached);
+            setStale(true);
+          }
+        } else {
+          const rows = (data as Sponsor[]) ?? [];
+          setSponsors(rows);
+          setStale(false);
+          setCached(CACHE_KEY, rows);
+        }
         setLoading(false);
       });
     return () => {
@@ -43,7 +59,7 @@ export function useSponsors() {
     };
   }, []);
 
-  return { sponsors, loading };
+  return { sponsors, loading, stale };
 }
 
 export function useSponsor(id: string | undefined) {

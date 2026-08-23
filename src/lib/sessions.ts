@@ -1,5 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "./supabase";
+import { getCached, setCached } from "./offlineCache";
+
+const CACHE_KEY = "sessions";
 
 export type SessionType =
   | "keynote"
@@ -140,6 +143,7 @@ export function useSessions() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -152,9 +156,23 @@ export function useSessions() {
       if (cancelled) return;
       if (error) {
         console.error("Failed to load sessions", error);
-        setError(error.message);
+        // Offline (or otherwise unreachable) -- fall back to whatever we
+        // cached from the last successful load instead of showing an error.
+        const cached = await getCached<Session[]>(CACHE_KEY);
+        if (cancelled) return;
+        if (cached) {
+          setSessions(cached);
+          setStale(true);
+          setError(null);
+        } else {
+          setError(error.message);
+        }
       } else {
-        setSessions((data as Session[]) ?? []);
+        const rows = (data as Session[]) ?? [];
+        setSessions(rows);
+        setStale(false);
+        setError(null);
+        setCached(CACHE_KEY, rows);
       }
       setLoading(false);
     }
@@ -175,5 +193,5 @@ export function useSessions() {
     };
   }, []);
 
-  return { sessions, loading, error };
+  return { sessions, loading, error, stale };
 }

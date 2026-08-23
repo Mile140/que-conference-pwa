@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import Nav from "./components/Nav";
 import SponsorFooter from "./components/SponsorFooter";
 import UpdateBanner from "./components/UpdateBanner";
+import OfflineIndicator from "./components/OfflineIndicator";
 import Home from "./pages/Home";
 import Schedule from "./pages/Schedule";
 import SessionDetail from "./pages/SessionDetail";
@@ -33,6 +34,7 @@ export default function App() {
   return (
     <div class="app-shell">
       <UpdateBanner />
+      <OfflineIndicator />
       <Header />
       <Nav />
       <main class="app-main">

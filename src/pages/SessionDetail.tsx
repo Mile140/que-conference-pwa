@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase";
 import { attendee, authSession } from "../lib/auth";
 import { useAgenda } from "../lib/agenda";
 import { useFeedback } from "../lib/feedback";
+import { isOnline } from "../lib/network";
 import { useSettings } from "../lib/settings";
 import { formatDay, formatTimeRange, TYPE_LABELS, type Session } from "../lib/sessions";
 
@@ -110,8 +111,9 @@ export default function SessionDetail({ id }: SessionDetailProps) {
               <button
                 key={n}
                 type="button"
+                disabled={!isOnline.value}
                 onClick={() => rate(n)}
-                title={`${n} out of 5`}
+                title={isOnline.value ? `${n} out of 5` : "You're offline"}
                 style={{
                   padding: "6px 12px",
                   background: rating !== null && n <= rating ? "var(--brand-accent)" : "transparent",
@@ -127,6 +129,11 @@ export default function SessionDetail({ id }: SessionDetailProps) {
           {rating !== null && (
             <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: 6, marginBottom: 0 }}>
               Thanks -- you rated this {rating}/5. Tap another number to change it.
+            </p>
+          )}
+          {!isOnline.value && (
+            <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: 6, marginBottom: 0 }}>
+              You're offline — reconnect to rate this session.
             </p>
           )}
         </div>

@@ -1,5 +1,6 @@
 import { useState } from "preact/hooks";
 import { attendee, authSession } from "../lib/auth";
+import { isOnline } from "../lib/network";
 import { usePhotoDetail, submitComment } from "../lib/photos";
 
 interface PhotoDetailProps {
@@ -20,6 +21,10 @@ export default function PhotoDetail({ id }: PhotoDetailProps) {
   async function handleSubmit(e: Event) {
     e.preventDefault();
     setError(null);
+    if (!isOnline.value) {
+      setError("You're offline — reconnect to post a comment.");
+      return;
+    }
     setSubmitting(true);
     const { error: err } = await submitComment(photo!.id, body);
     setSubmitting(false);
@@ -60,8 +65,8 @@ export default function PhotoDetail({ id }: PhotoDetailProps) {
               style={{ padding: 8, resize: "vertical" }}
             />
             {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-            <button type="submit" disabled={submitting || !body.trim()} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
-              {submitting ? "Posting…" : "Post comment"}
+            <button type="submit" disabled={submitting || !body.trim() || !isOnline.value} style={{ alignSelf: "flex-start", padding: "8px 14px" }}>
+              {submitting ? "Posting…" : isOnline.value ? "Post comment" : "Offline"}
             </button>
           </form>
         ) : (

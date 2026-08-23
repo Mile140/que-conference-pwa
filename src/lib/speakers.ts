@@ -1,5 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { supabase } from "./supabase";
+import { getCached, setCached } from "./offlineCache";
+
+const CACHE_KEY = "speakers";
 
 /**
  * Speakers page (spec §3.3) -- attendees flagged `is_speaker`, no separate
@@ -36,6 +39,7 @@ export function useSpeakers() {
   const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,13 +50,26 @@ export function useSpeakers() {
       )
       .eq("is_speaker", true)
       .order("name", { ascending: true })
-      .then(({ data, error: err }) => {
+      .then(async ({ data, error: err }) => {
         if (cancelled) return;
         if (err) {
           console.error("Failed to load speakers", err);
-          setError(err.message);
+          const cached = await getCached<Speaker[]>(CACHE_KEY);
+          if (cancelled) return;
+          if (cached) {
+            setSpeakers(cached);
+            setStale(true);
+            setError(null);
+          } else {
+            setError(err.message);
+          }
+        } else {
+          const rows = (data as unknown as Speaker[]) ?? [];
+          setSpeakers(rows);
+          setStale(false);
+          setError(null);
+          setCached(CACHE_KEY, rows);
         }
-        setSpeakers((data as unknown as Speaker[]) ?? []);
         setLoading(false);
       });
     return () => {
@@ -60,5 +77,5 @@ export function useSpeakers() {
     };
   }, []);
 
-  return { speakers, loading, error };
+  return { speakers, loading, error, stale };
 }
