@@ -6,9 +6,10 @@ const CACHE_KEY = "venue_maps";
 
 /**
  * Venue/hotel/off-site maps (spec §3.11) -- uploaded images and/or text,
- * admin-editable. `type` is free text (e.g. "venue", "hotel", "offsite")
- * rather than an enum, so the UI just displays whatever value is set
- * without assuming a fixed set of categories.
+ * admin-editable. `type` is constrained by a DB check constraint
+ * (venue_maps_type_check) to exactly "main_venue" | "hotel" | "offsite" --
+ * the admin form (AdminMaps.tsx) uses a <select> with those three values
+ * rather than free text, so it can't drift out of sync with the constraint.
  */
 export interface VenueMap {
   id: string;

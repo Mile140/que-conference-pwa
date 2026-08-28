@@ -17,7 +17,9 @@ type MapFormState = {
   sort: string;
 };
 
-const BLANK_FORM: MapFormState = { title: "", type: "venue", description: "", image_url: "", sort: "0" };
+const MAP_TYPES = ["main_venue", "hotel", "offsite"] as const;
+
+const BLANK_FORM: MapFormState = { title: "", type: "main_venue", description: "", image_url: "", sort: "0" };
 
 export default function AdminMaps(_props: AdminMapsProps) {
   return (
@@ -84,7 +86,7 @@ function AdminMapsContent() {
             key={m.id}
             initial={{
               title: m.title,
-              type: m.type ?? "",
+              type: m.type ?? "main_venue",
               description: m.description ?? "",
               image_url: m.image_url ?? "",
               sort: String(m.sort ?? 0),
@@ -182,12 +184,17 @@ function MapForm({
   return (
     <form onSubmit={handleSubmit} class="card" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <input placeholder="Title" value={form.title} onInput={(e) => set("title", (e.target as HTMLInputElement).value)} style={{ padding: 8 }} />
-      <input
-        placeholder="Type (e.g. venue, hotel, offsite)"
+      <select
         value={form.type}
-        onInput={(e) => set("type", (e.target as HTMLInputElement).value)}
+        onChange={(e) => set("type", (e.target as HTMLSelectElement).value)}
         style={{ padding: 8 }}
-      />
+      >
+        {MAP_TYPES.map((t) => (
+          <option key={t} value={t}>
+            {t}
+          </option>
+        ))}
+      </select>
       <textarea
         placeholder="Description"
         value={form.description}
