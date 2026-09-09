@@ -16,6 +16,10 @@ Usage:
     cp scripts/.env.example scripts/.env   # fill in SUPABASE_SERVICE_ROLE_KEY
     python scripts/import_sessions.py path/to/agenda.xlsx --seed-rooms
 
+    # Or with no argument at all: looks in the current working directory
+    # (wherever you run the script from) for QueGroup_2026_agenda.xlsx.
+    python scripts/import_sessions.py --seed-rooms
+
 The service role key is required (not the anon key) because `sessions`
 writes are admin-only under RLS, and this script runs outside any attendee/
 admin login session. NEVER commit scripts/.env or expose this key to the
@@ -26,8 +30,42 @@ import datetime
 import os
 import re
 import sys
+from zoneinfo import ZoneInfo
 
 import openpyxl
+
+DEFAULT_XLSX_NAME = "QueGroup_2026_agenda.xlsx"
+
+# The conference runs in San Diego. `sessions.start`/`end` are `timestamptz`
+# columns, and the frontend formats them for display in this timezone
+# regardless of the viewer's own device timezone (see VENUE_TIMEZONE in
+# src/lib/sessions.ts) -- so the instant we write here has to be correct in
+# Pacific time, not a naive "looks right" string. A plain
+# "2026-09-16T13:00:00" with no UTC offset gets interpreted by Postgres as
+# UTC, silently shifting every session 7-8 hours early. Attaching this
+# tzinfo before calling .isoformat() makes Python compute and include the
+# correct offset (-07:00 for these September dates, DST-aware).
+VENUE_TZ = ZoneInfo("America/Los_Angeles")
+
+
+def to_venue_iso(date_str: str, time_str: str) -> str:
+    naive = datetime.datetime.fromisoformat(f"{date_str}T{time_str}")
+    return naive.replace(tzinfo=VENUE_TZ).isoformat()
+
+
+def resolve_default_xlsx_path() -> str:
+    """Look in the current working directory for QueGroup_2026_agenda.xlsx."""
+    candidate = os.path.join(os.getcwd(), DEFAULT_XLSX_NAME)
+    if os.path.isfile(candidate):
+        return candidate
+    print(
+        f"No xlsx path given, and couldn't find {DEFAULT_XLSX_NAME} in the "
+        f"current directory ({os.getcwd()}).\n"
+        "Either place the file there, or pass a path explicitly:\n"
+        "  python scripts/import_sessions.py path/to/agenda.xlsx",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 # ---------------------------------------------------------------------------
 # Config that's specific to *this* workbook's quirks. Update these as the
@@ -232,8 +270,8 @@ def build_session_rows(parsed, seed_rooms: bool):
         base = {
             "title": row["topic"],
             "day": row["date"],
-            "start": f"{row['date']}T{row['start']}",
-            "end": f"{row['date']}T{row['end']}",
+            "start": to_venue_iso(row["date"], row["start"]),
+            "end": to_venue_iso(row["date"], row["end"]),
             "type": classify_type(row["topic"]),
             "description": row["description"] or None,
             "presenter_text": presenter,
@@ -259,7 +297,15 @@ def build_session_rows(parsed, seed_rooms: bool):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("xlsx_path", help="Path to the agenda .xlsx file")
+    parser.add_argument(
+        "xlsx_path",
+        nargs="?",
+        default=None,
+        help=(
+            "Path to the agenda .xlsx file. If omitted, looks for "
+            f"{DEFAULT_XLSX_NAME} in the current directory."
+        ),
+    )
     parser.add_argument(
         "--seed-rooms",
         action="store_true",
@@ -271,10 +317,11 @@ def main():
     )
     args = parser.parse_args()
 
-    parsed = parse_workbook(args.xlsx_path)
+    xlsx_path = args.xlsx_path or resolve_default_xlsx_path()
+    parsed = parse_workbook(xlsx_path)
     rows = build_session_rows(parsed, seed_rooms=args.seed_rooms)
 
-    print(f"Parsed {len(rows)} session rows from {args.xlsx_path}")
+    print(f"Parsed {len(rows)} session rows from {xlsx_path}")
     for r in rows:
         print(f"  {r['day']} {r['start'][11:16]}-{r['end'][11:16]}  [{r['type']:14s}]  {r['title'][:50]}"
               + (f"  room={r['room']!r}" if "room" in r else ""))

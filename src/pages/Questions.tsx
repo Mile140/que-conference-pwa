@@ -44,7 +44,7 @@ export default function Questions(_props: QuestionsProps) {
     <>
       <PageHero
         eyebrow="2026 QUE Group Conference"
-        title="Day-3 discussion questions"
+        title="Day 2 Q&A Panel Questions and Day 3 Discussion Questions"
         subtitle="Submit what you want covered in the group discussion, and upvote what others have asked so the moderator knows what matters most."
       />
 
