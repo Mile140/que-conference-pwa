@@ -47,22 +47,26 @@ HEADER_ROW_MARKERS = {"DAY 1", "DAY 2", "DAY 3"}
 # session of a day, so there's no prior end-time to infer "forward
 # progress" from). Keyed by source_row_key computed with the *literal*
 # (unresolved) start time, mapped to the correct (start, end) in 24h HH:MM.
-MANUAL_TIME_OVERRIDES = {
-    "2026-09-15-0100-cc-headquarters-welcome": ("13:00", "17:00"),
-}
+# Empty for the 2026 workbook -- START/END are real Excel time cells this
+# year (datetime.time, already unambiguous), not the mixed 12h/24h
+# text/number entry the 2025 sheet used. Add entries here again if a future
+# revision reintroduces ambiguous time cells.
+MANUAL_TIME_OVERRIDES = {}
 
 # Split one workbook row into multiple session rows in different rooms
 # (e.g. concurrent round tables). Keyed by source_row_key (computed with the
 # *resolved* start time). Only applied when --seed-rooms is passed.
-ROOM_SPLIT_OVERRIDES = {
-    "2026-09-16-1500-round-tables-2": ["Main Conf Room", "Breakout Room"],
-}
+# Empty for the 2026 workbook -- concurrent sessions (round tables, breakouts)
+# are already listed as separate rows this year, each with its own LOCATION,
+# rather than one row covering multiple rooms. Add entries here again if a
+# future revision goes back to combining them into a single row.
+ROOM_SPLIT_OVERRIDES = {}
 
 TYPE_KEYWORDS = [
-    (r"\bbreak\b|\blunch\b", "meal_break"),
+    (r"\bbreak(?:fast)?\b|\blunch\b", "meal_break"),
     (r"\bpanel\b", "panel"),
-    (r"round table|work thru|working session", "hands_on_lab"),
-    (r"take off|board introductions|kick ?off", "keynote"),
+    (r"round table|work.?thru|working session|workshop", "hands_on_lab"),
+    (r"take.?off|board introductions|kick.?off", "keynote"),
 ]
 DEFAULT_TYPE = "general_session"
 
@@ -125,12 +129,35 @@ def pick_candidate(cands, floor_minutes):
     return min(valid) if valid else min(cands)
 
 
+def split_location(location):
+    """The 2026 sheet's LOCATION column is sometimes a plain venue name
+    ("CC HQ", "Starlight Outdoor Terrace") and sometimes "Category: Room"
+    ("General Session: Gaslamp", "Breakout: Santa Rosa") -- split the latter
+    into (track, room) so Schedule's track/room filters actually have
+    something to filter on. A handful of rows list multiple locations
+    stacked with blank lines (one workshop using several rooms at once);
+    those are joined into a single room string rather than split, since it's
+    one session in all of them, not a choice between rooms."""
+    if not location or not isinstance(location, str):
+        return None, None
+    text = location.strip()
+    if not text:
+        return None, None
+    if "\n" in text:
+        parts = [p.strip() for p in text.split("\n") if p.strip()]
+        return None, "; ".join(parts)
+    if ": " in text:
+        track, room = text.split(": ", 1)
+        return track.strip(), room.strip()
+    return None, text
+
+
 def parse_workbook(path: str):
     wb = openpyxl.load_workbook(path, data_only=True)
     ws = wb["Sheet1"]
 
     raw_rows = []
-    for day, start, end, topic, desc, presenter, location in ws.iter_rows(
+    for day, start, end, topic, desc, presenter, location, note in ws.iter_rows(
         min_row=2, values_only=True
     ):
         if day in HEADER_ROW_MARKERS or topic is None:
@@ -138,6 +165,11 @@ def parse_workbook(path: str):
         key = str(day).strip().lower() if day else ""
         if key not in DAY_TO_DATE:
             continue
+        description = (desc or "").strip() if isinstance(desc, str) else desc
+        note_text = (note or "").strip() if isinstance(note, str) else note
+        if note_text:
+            description = f"{description}\n\n{note_text}" if description else note_text
+        track, room = split_location(location)
         raw_rows.append(
             {
                 "day_key": key,
@@ -145,9 +177,10 @@ def parse_workbook(path: str):
                 "start_raw": start,
                 "end_raw": end,
                 "topic": str(topic).strip(),
-                "description": (desc or "").strip() if isinstance(desc, str) else desc,
+                "description": description,
                 "presenter": (presenter or "").strip() if isinstance(presenter, str) else presenter,
-                "location": location,
+                "track": track,
+                "room": room,
             }
         )
 
@@ -195,6 +228,7 @@ def parse_workbook(path: str):
 def build_session_rows(parsed, seed_rooms: bool):
     out = []
     for row in parsed:
+        presenter = row["presenter"].replace("\n", ", ") if row["presenter"] else None
         base = {
             "title": row["topic"],
             "day": row["date"],
@@ -202,7 +236,8 @@ def build_session_rows(parsed, seed_rooms: bool):
             "end": f"{row['date']}T{row['end']}",
             "type": classify_type(row["topic"]),
             "description": row["description"] or None,
-            "presenter_text": row["presenter"] or None,
+            "presenter_text": presenter,
+            "track": row["track"],
         }
 
         if seed_rooms and row["source_row_key"] in ROOM_SPLIT_OVERRIDES:
@@ -217,7 +252,7 @@ def build_session_rows(parsed, seed_rooms: bool):
         else:
             entry = {**base, "source_row_key": row["source_row_key"]}
             if seed_rooms:
-                entry["room"] = row["location"] or None
+                entry["room"] = row["room"]
             out.append(entry)
     return out
 
