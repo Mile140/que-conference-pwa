@@ -22,12 +22,38 @@ Usage:
     pip install -r scripts/requirements.txt
     cp scripts/.env.example scripts/.env   # fill in SUPABASE_SERVICE_ROLE_KEY
     python scripts/import_attendees.py path/to/export.xlsx
+
+    # Or with no argument at all: looks in the current working directory
+    # (wherever you run the script from) for a file named
+    # QUE_Group_Conference_2026_Attendees.xlsx or .csv.
+    python scripts/import_attendees.py
 """
 import argparse
 import csv
 import os
 import re
 import sys
+
+DEFAULT_EXPORT_BASENAME = "QUE_Group_Conference_2026_Attendees"
+DEFAULT_EXPORT_EXTENSIONS = (".xlsx", ".csv")
+
+
+def resolve_default_export_path() -> str:
+    """Look in the current working directory for a file named
+    QUE_Group_Conference_2026_Attendees.xlsx or .csv, in that order."""
+    for ext in DEFAULT_EXPORT_EXTENSIONS:
+        candidate = os.path.join(os.getcwd(), DEFAULT_EXPORT_BASENAME + ext)
+        if os.path.isfile(candidate):
+            return candidate
+    tried = ", ".join(DEFAULT_EXPORT_BASENAME + ext for ext in DEFAULT_EXPORT_EXTENSIONS)
+    print(
+        f"No export path given, and couldn't find one of [{tried}] in the "
+        f"current directory ({os.getcwd()}).\n"
+        "Either place the export there under that name, or pass a path explicitly:\n"
+        "  python scripts/import_attendees.py path/to/export.xlsx",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 FREE_EMAIL_DOMAINS = {
     "gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "aol.com",
@@ -110,13 +136,22 @@ def parse_attendees(path: str):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("export_path", help="Path to the Eventbrite export (.xlsx or .csv)")
+    parser.add_argument(
+        "export_path",
+        nargs="?",
+        default=None,
+        help=(
+            "Path to the Eventbrite export (.xlsx or .csv). If omitted, looks for "
+            f"{DEFAULT_EXPORT_BASENAME}.xlsx or .csv in the current directory."
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print what would be upserted, don't write.")
     args = parser.parse_args()
 
-    attendees, skipped = parse_attendees(args.export_path)
+    export_path = args.export_path or resolve_default_export_path()
+    attendees, skipped = parse_attendees(export_path)
 
-    print(f"Parsed {len(attendees)} unique attendees from {args.export_path}")
+    print(f"Parsed {len(attendees)} unique attendees from {export_path}")
     for a in attendees[:10]:
         print(f"  {a['name'] or '(no name)':30s}  {a['email']:35s}  company={a['company']}")
     if len(attendees) > 10:
