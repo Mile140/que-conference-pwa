@@ -1,5 +1,5 @@
 import { render } from "preact";
-import App from "./app";
+import App from "./App";
 import "./theme.css";
 import "./lib/theme";
 import { initAuth } from "./lib/auth";

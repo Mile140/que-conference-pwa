@@ -87,6 +87,13 @@ function AdminHomeContent() {
       </section>
 
       <section class="card">
+        <h3 style={{ marginTop: 0 }}>People</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <RouterLink href="/admin/attendees">Attendees</RouterLink>
+        </div>
+      </section>
+
+      <section class="card">
         <h3 style={{ marginTop: 0 }}>Insights</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <RouterLink href="/admin/stats">Usage stats</RouterLink>
@@ -96,7 +103,8 @@ function AdminHomeContent() {
       <section class="card">
         <p style={{ color: "var(--text-muted)", margin: 0 }}>
           Eventbrite import isn't in the admin console yet — run <code>scripts/import_attendees.py</code>{" "}
-          for attendee imports, and use the Supabase dashboard directly for anything else not listed above.
+          for bulk attendee imports (Attendees above handles one-off edits fine), and use the Supabase
+          dashboard directly for anything else not listed above.
         </p>
       </section>
     </>

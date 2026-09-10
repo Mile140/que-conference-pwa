@@ -26,6 +26,7 @@ import AdminModeration from "./pages/admin/AdminModeration";
 import AdminAnnouncements from "./pages/admin/AdminAnnouncements";
 import AdminSessions from "./pages/admin/AdminSessions";
 import AdminSpeakers from "./pages/admin/AdminSpeakers";
+import AdminAttendees from "./pages/admin/AdminAttendees";
 import AdminSponsors from "./pages/admin/AdminSponsors";
 import AdminMaps from "./pages/admin/AdminMaps";
 import AdminInfoPages from "./pages/admin/AdminInfoPages";
@@ -64,6 +65,7 @@ export default function App() {
           <AdminAnnouncements path="/admin/announcements" />
           <AdminSessions path="/admin/sessions" />
           <AdminSpeakers path="/admin/speakers" />
+          <AdminAttendees path="/admin/attendees" />
           <AdminSponsors path="/admin/sponsors" />
           <AdminMaps path="/admin/maps" />
           <AdminInfoPages path="/admin/info" />
