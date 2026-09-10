@@ -16,7 +16,10 @@ export default function OfflineIndicator() {
         top: 0,
         zIndex: 50,
         textAlign: "center",
+        // Same iOS safe-area note as UpdateBanner.tsx -- sticky at the very
+        // top of the viewport, needs padding under the notch/status bar.
         padding: "8px 16px",
+        paddingTop: "calc(8px + env(safe-area-inset-top))",
         background: "var(--navy)",
         color: "var(--white)",
         fontSize: "0.85rem",

@@ -14,7 +14,12 @@ export default function UpdateBanner() {
         justifyContent: "center",
         alignItems: "center",
         gap: 12,
+        // Sticky at the very top of the viewport, above the header -- needs
+        // the same iOS safe-area padding as .app-header (see theme.css) so
+        // it doesn't render under the status bar/notch and become
+        // unreadable and unclickable.
         padding: "10px 16px",
+        paddingTop: "calc(10px + env(safe-area-inset-top))",
         background: "var(--brand-accent)",
         color: "var(--white)",
         fontSize: "0.9rem",

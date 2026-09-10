@@ -27,7 +27,7 @@ export default function Info(_props: InfoProps) {
 
       {pages.map((p) => (
         <div class="card" key={p.id}>
-          <strong>{p.title}</strong>
+          <strong style={{ color: "var(--brand-highlight)", fontSize: "1.2rem" }}>{p.title}</strong>
           {p.body && <p style={{ marginBottom: 0, whiteSpace: "pre-wrap" }}>{p.body}</p>}
         </div>
       ))}

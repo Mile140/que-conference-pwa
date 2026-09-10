@@ -83,7 +83,15 @@ button {
 .app-header {
   background: var(--brand-primary);
   color: var(--white);
-  padding: var(--space-3) var(--space-4);
+  /* iOS status-bar-style is "black-translucent" (see index.html), which lets
+     this header draw underneath the notch/Dynamic Island/status bar icons
+     instead of the OS reserving that space -- so without this, the top of
+     the header (brand text, and the update/offline banners above it, which
+     use the same padding-top trick) sits directly behind the time/wifi/
+     battery icons and becomes unreadable and unclickable. env() resolves to
+     0 on browsers that don't need it (desktop, Android), so this is a no-op
+     everywhere except notched iOS devices in standalone/home-screen mode. */
+  padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) var(--space-3);
   display: flex;
   align-items: center;
   justify-content: space-between;

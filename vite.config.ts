@@ -43,8 +43,8 @@ export default defineConfig({
       // used here so the manifest is valid and install works in the meantime;
       // no code-execution sandbox was available this session to rasterize PNGs.
       manifest: {
-        name: "QUE Group Conference",
-        short_name: "QUE Conference",
+        name: "2026 QUE Group Conference",
+        short_name: "2026 QUE Conference",
         description: "QUE Group Conference companion app — schedule, directory, and live updates.",
         theme_color: "#15294D",
         background_color: "#FFFFFF",

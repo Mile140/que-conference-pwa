@@ -9,7 +9,7 @@ interface VerifyProps {
 type Step = "email" | "code";
 
 /**
- * Passwordless verification (spec §2.2/D24): email -> 6-digit code -> done.
+ * Passwordless verification (spec §2.2/D24): email -> 8-digit code -> done.
  * No password, ever. Unlocks personal agenda, directory presence, contact,
  * Day-3 questions, feedback, photo wall, and the private learning list.
  */
@@ -55,7 +55,7 @@ export default function Verify(_props: VerifyProps) {
     <section class="card">
       <h2 style={{ marginTop: 0 }}>Verify your email</h2>
       <p style={{ color: "var(--text-muted)" }}>
-        No password -- just a 6-digit code, once. Unlocks your personal agenda, the
+        No password -- just an 8-digit code, once. Unlocks your personal agenda, the
         attendee directory, Day-3 questions, session feedback, the photo wall, and your
         private learning list.
       </p>
@@ -79,14 +79,14 @@ export default function Verify(_props: VerifyProps) {
       {step === "code" && (
         <form onSubmit={handleVerify}>
           <p>
-            Sent a 6-digit code to <strong>{email}</strong>.
+            Sent an 8-digit code to <strong>{email}</strong>.
           </p>
           <input
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
             required
-            placeholder="123456"
+            placeholder="12345678"
             value={code}
             onInput={(e) => setCode((e.target as HTMLInputElement).value)}
             style={{ width: "100%", padding: 10, marginBottom: 8, letterSpacing: 4 }}
