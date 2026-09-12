@@ -111,7 +111,7 @@ export default function Schedule(_props: ScheduleProps) {
               <div class="session-row" title={TYPE_LABELS[s.type]}>
                 <div class={`session-bar session-bar-${s.type}`} />
                 <div style={{ flex: 1 }}>
-                  <strong>{s.title}</strong>
+                  <strong class={`session-title-${s.type}`}>{s.title}</strong>
                   <div style={{ color: "var(--text-muted)", marginTop: 4 }}>
                     {formatTimeRange(s)}
                     {s.room ? ` · ${s.room}` : ""}

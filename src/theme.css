@@ -32,6 +32,19 @@
   --brand-highlight: var(--gold);
   --border: #d7e2ef;
   --link: var(--steel-blue);
+
+  /* One distinct color per session type (spec: Schedule cards), chosen to
+     sit alongside the navy/steel-blue/gold palette without clashing --
+     cool blues for the "content" types, gold reserved for keynote as the
+     marquee event, and two warm/violet accents for lightning tips and
+     hands-on labs so all six read apart at a glance. Meal/break gets a
+     muted neutral since it's not session content. */
+  --type-keynote: var(--gold);
+  --type-general_session: var(--steel-blue);
+  --type-panel: #6a4c93;
+  --type-lightning_tip: #2f8f7a;
+  --type-hands_on_lab: #b2562f;
+  --type-meal_break: #6b7a8f;
 }
 
 :root[data-theme="dark"] {
@@ -45,6 +58,15 @@
   --brand-highlight: var(--gold);
   --border: #26385c;
   --link: #8fb6e6;
+
+  /* Lighter tints of the same hues -- dark elevated cards (#17294a) need
+     more luminance than the light-theme values to stay readable. */
+  --type-keynote: var(--gold);
+  --type-general_session: #7ba3d0;
+  --type-panel: #a98fd1;
+  --type-lightning_tip: #5cc4ab;
+  --type-hands_on_lab: #e08a5c;
+  --type-meal_break: #9db0c7;
 }
 
 * {
@@ -284,19 +306,52 @@ button {
   flex-shrink: 0;
 }
 
-.session-bar-keynote,
+.session-bar-keynote {
+  background: var(--type-keynote);
+}
+
 .session-bar-general_session {
-  background: var(--steel-blue);
+  background: var(--type-general_session);
 }
 
-.session-bar-lightning_tip,
+.session-bar-panel {
+  background: var(--type-panel);
+}
+
+.session-bar-lightning_tip {
+  background: var(--type-lightning_tip);
+}
+
 .session-bar-hands_on_lab {
-  background: var(--gold);
+  background: var(--type-hands_on_lab);
 }
 
-.session-bar-panel,
 .session-bar-meal_break {
-  background: var(--mid-blue);
+  background: var(--type-meal_break);
+}
+
+.session-title-keynote {
+  color: var(--type-keynote);
+}
+
+.session-title-general_session {
+  color: var(--type-general_session);
+}
+
+.session-title-panel {
+  color: var(--type-panel);
+}
+
+.session-title-lightning_tip {
+  color: var(--type-lightning_tip);
+}
+
+.session-title-hands_on_lab {
+  color: var(--type-hands_on_lab);
+}
+
+.session-title-meal_break {
+  color: var(--type-meal_break);
 }
 
 .avatar-ring {
