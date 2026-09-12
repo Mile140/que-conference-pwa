@@ -10,11 +10,20 @@ interface QuestionsProps {
   path?: string;
 }
 
-/** Day-3 discussion questions (spec §3.6): public read, verified submit + upvote. */
+/**
+ * Day 2 Q&A Panel Questions and Day 3 Discussion Questions (spec §3.6):
+ * public read, public submit (name required if unverified), verified
+ * upvote. Submitting doesn't require verification -- someone might be
+ * hitting the exact app trouble verification itself would involve -- but
+ * since this is a public list, an unverified submitter has to give a name
+ * so their question doesn't just show up anonymous next to everyone else's
+ * real name; `questions_guest_name_required` enforces that server-side too.
+ */
 export default function Questions(_props: QuestionsProps) {
   const { questions, voteCounts, myVotes, loading, error: loadError, submit, toggleVote } = useQuestions();
   const { settings } = useSettings();
   const [body, setBody] = useState("");
+  const [guestName, setGuestName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const verified = authSession.value && attendee.value;
@@ -31,13 +40,14 @@ export default function Questions(_props: QuestionsProps) {
       return;
     }
     setSubmitting(true);
-    const { error: err } = await submit(body);
+    const { error: err } = await submit(body, verified ? undefined : guestName);
     setSubmitting(false);
     if (err) {
       setError(err);
       return;
     }
     setBody("");
+    setGuestName("");
   }
 
   return (
@@ -49,18 +59,27 @@ export default function Questions(_props: QuestionsProps) {
       />
 
       <section class="card">
-        {!verified && (
-          <p style={{ color: "var(--text-muted)", margin: 0 }}>
-            <a href="/verify">Verify your email</a> to submit a question or upvote.
-          </p>
-        )}
-
-        {verified && !settings.questions_open && (
+        {!settings.questions_open && (
           <p style={{ color: "var(--text-muted)", margin: 0 }}>Question submission is currently closed.</p>
         )}
 
-        {verified && settings.questions_open && (
+        {settings.questions_open && (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {!verified && (
+              <>
+                <p style={{ color: "var(--text-muted)", margin: 0, fontSize: "0.85rem" }}>
+                  Not verified, so your name is required here (this list is public, unlike Feedback).{" "}
+                  <a href="/verify">Verify your email</a> instead if you also want to upvote.
+                </p>
+                <input
+                  value={guestName}
+                  onInput={(e) => setGuestName((e.target as HTMLInputElement).value)}
+                  placeholder="Your name (required)"
+                  required
+                  style={{ padding: 10 }}
+                />
+              </>
+            )}
             <textarea
               value={body}
               onInput={(e) => setBody((e.target as HTMLTextAreaElement).value)}
@@ -69,7 +88,12 @@ export default function Questions(_props: QuestionsProps) {
               style={{ padding: 10, resize: "vertical" }}
             />
             {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-            <button type="submit" class="btn-gold" disabled={submitting || !body.trim() || !isOnline.value} style={{ alignSelf: "flex-start" }}>
+            <button
+              type="submit"
+              class="btn-gold"
+              disabled={submitting || !body.trim() || !isOnline.value || (!verified && !guestName.trim())}
+              style={{ alignSelf: "flex-start" }}
+            >
               {submitting ? "Submitting…" : isOnline.value ? "Submit question" : "Offline"}
             </button>
           </form>
@@ -89,7 +113,8 @@ export default function Questions(_props: QuestionsProps) {
             <div style={{ flex: 1 }}>
               <p style={{ margin: 0 }}>{q.body}</p>
               <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: 4 }}>
-                {q.attendees?.name || "Attendee"}
+                {q.attendees?.name || q.guest_name || "Attendee"}
+                {!q.attendee_id && " (unverified)"}
               </div>
             </div>
             <button

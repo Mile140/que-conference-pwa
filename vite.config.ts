@@ -4,16 +4,18 @@ import preact from "@preact/preset-vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // Build identifier shown in the footer and used to tell attendees a new
-// version is available (see src/lib/updateSW.ts). Short commit hash + build
-// date; falls back to a timestamp if git isn't available (e.g. a source
-// zip rather than a clone) so the build never fails over this.
+// version is available (see src/lib/updateSW.ts). Build date + time (so two
+// builds from the same commit on the same day are still distinguishable --
+// several fixes have shipped same-day recently) + short commit hash; falls
+// back to just a timestamp if git isn't available (e.g. a source zip rather
+// than a clone) so the build never fails over this.
 function buildVersion(): string {
+  const timestamp = new Date().toISOString().slice(0, 16).replace("T", "-").replace(":", "");
   try {
     const hash = execSync("git rev-parse --short HEAD").toString().trim();
-    const date = new Date().toISOString().slice(0, 10);
-    return `${date}-${hash}`;
+    return `${timestamp}-${hash}`;
   } catch {
-    return new Date().toISOString().slice(0, 16).replace("T", "-");
+    return timestamp;
   }
 }
 

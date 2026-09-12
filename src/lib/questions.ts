@@ -3,18 +3,25 @@ import { attendee } from "./auth";
 import { supabase } from "./supabase";
 
 /**
- * Day-3 discussion questions (spec §3.6). Public read (even for guests --
- * RLS only hides `hidden` rows), verified-attendee submit + upvote. Vote
- * counts are computed client-side from `question_votes`; at conference
- * scale (dozens of questions, ~100 attendees) that's cheap and avoids a
- * separate aggregate view.
+ * Day 2/3 Q&A questions (spec §3.6). Public read (even for guests -- RLS
+ * only hides `hidden` rows). Submitting doesn't require verification --
+ * someone might be hitting the exact app trouble verification itself would
+ * involve -- but since this is a public list (unlike the private Feedback
+ * inbox), an unverified submitter has to give a name so their question
+ * isn't just anonymous in a shared feed; `questions_guest_name_required`
+ * enforces that server-side, not just in the form. Upvoting still requires
+ * verification (attendee.value), since there's no other stable identity to
+ * dedupe votes against for a guest. Vote counts are computed client-side
+ * from `question_votes`; at conference scale (dozens of questions, ~100
+ * attendees) that's cheap and avoids a separate aggregate view.
  */
 export interface QuestionRow {
   id: string;
-  attendee_id: string;
+  attendee_id: string | null;
   body: string;
   created_at: string;
   hidden: boolean;
+  guest_name: string | null;
   attendees: { name: string | null } | null;
 }
 
@@ -34,7 +41,7 @@ export function useQuestions() {
         // creates an implicit many-to-many bridge between them on top of
         // this table's own direct FK, so plain `attendees(name)` is
         // ambiguous to PostgREST (HTTP 300) and silently returns nothing.
-        .select("*, attendees!questions_attendee_id_fkey(name)")
+        .select("id, attendee_id, body, created_at, hidden, guest_name, attendees!questions_attendee_id_fkey(name)")
         .order("created_at", { ascending: true }),
       supabase.from("question_votes").select("question_id, attendee_id"),
     ]);
@@ -48,7 +55,7 @@ export function useQuestions() {
     // client-side so this page is always the true attendee view regardless
     // of who's signed in -- moderation (AdminModeration.tsx) is the one
     // place hidden questions should actually show up.
-    setQuestions(((qData as QuestionRow[]) ?? []).filter((q) => !q.hidden));
+    setQuestions(((qData as unknown as QuestionRow[]) ?? []).filter((q) => !q.hidden));
 
     const counts = new Map<string, number>();
     const mine = new Set<string>();
@@ -74,12 +81,21 @@ export function useQuestions() {
     };
   }, [load]);
 
-  async function submit(body: string): Promise<{ error: string | null }> {
-    const a = attendee.value;
-    if (!a) return { error: "Verify your email first." };
+  async function submit(body: string, guestName?: string): Promise<{ error: string | null }> {
     const trimmed = body.trim();
     if (!trimmed) return { error: "Question can't be empty." };
-    const { error } = await supabase.from("questions").insert({ attendee_id: a.id, body: trimmed });
+
+    const a = attendee.value;
+    if (!a) {
+      const trimmedName = guestName?.trim();
+      if (!trimmedName) return { error: "Enter your name — required so it isn't anonymous in the list." };
+      const { error } = await supabase.from("questions").insert({ attendee_id: null, body: trimmed, guest_name: trimmedName });
+      return { error: error?.message ?? null };
+    }
+
+    const { error } = await supabase
+      .from("questions")
+      .insert({ attendee_id: a.id, body: trimmed, guest_name: null });
     return { error: error?.message ?? null };
   }
 

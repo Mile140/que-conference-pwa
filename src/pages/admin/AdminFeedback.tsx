@@ -12,6 +12,8 @@ interface IssueReportRow {
   body: string;
   created_at: string;
   resolved: boolean;
+  guest_name: string | null;
+  guest_email: string | null;
   attendees: { name: string | null; email: string } | null;
 }
 
@@ -35,7 +37,7 @@ function AdminFeedbackContent() {
     // even though issue_reports only has the one FK path to attendees.
     const { data, error: err } = await supabase
       .from("issue_reports")
-      .select("id, body, created_at, resolved, attendees!issue_reports_attendee_id_fkey(name, email)")
+      .select("id, body, created_at, resolved, guest_name, guest_email, attendees!issue_reports_attendee_id_fkey(name, email)")
       .order("created_at", { ascending: false });
     if (err) console.error("Failed to load issue reports", err);
     setError(err?.message ?? null);
@@ -85,8 +87,10 @@ function AdminFeedbackContent() {
             <div>
               <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{r.body}</p>
               <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: 4 }}>
-                {r.attendees?.name || "Attendee"}
-                {r.attendees?.email ? ` · ${r.attendees.email}` : ""} · {new Date(r.created_at).toLocaleString()}
+                {r.attendees?.name || r.guest_name || (r.attendees || r.guest_email ? "Attendee" : "Anonymous (unverified)")}
+                {(r.attendees?.email || r.guest_email) ? ` · ${r.attendees?.email || r.guest_email}` : ""} ·{" "}
+                {new Date(r.created_at).toLocaleString()}
+                {!r.attendees && " · unverified"}
                 {r.resolved ? " · Resolved" : ""}
               </div>
             </div>

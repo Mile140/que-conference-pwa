@@ -12,6 +12,7 @@ interface ModeratedQuestion {
   body: string;
   created_at: string;
   hidden: boolean;
+  guest_name: string | null;
   attendees: { name: string | null } | null;
 }
 
@@ -36,7 +37,7 @@ function AdminModerationContent() {
     // so plain `attendees(name)` is ambiguous to PostgREST (HTTP 300).
     const { data, error: err } = await supabase
       .from("questions")
-      .select("id, body, created_at, hidden, attendees!questions_attendee_id_fkey(name)")
+      .select("id, body, created_at, hidden, guest_name, attendees!questions_attendee_id_fkey(name)")
       .order("created_at", { ascending: false });
     if (err) console.error("Failed to load questions for moderation", err);
     setError(err?.message ?? null);
@@ -71,7 +72,8 @@ function AdminModerationContent() {
             <div>
               <p style={{ margin: 0 }}>{q.body}</p>
               <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: 4 }}>
-                {q.attendees?.name || "Attendee"} · {q.hidden ? "Hidden" : "Visible"}
+                {q.attendees?.name || q.guest_name || "Attendee"}
+                {!q.attendees && " (unverified)"} · {q.hidden ? "Hidden" : "Visible"}
               </div>
             </div>
             <button
