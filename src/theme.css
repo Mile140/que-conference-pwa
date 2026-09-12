@@ -35,16 +35,17 @@
 
   /* One distinct color per session type (spec: Schedule cards), chosen to
      sit alongside the navy/steel-blue/gold palette without clashing --
-     cool blues for the "content" types, gold reserved for keynote as the
-     marquee event, and two warm/violet accents for lightning tips and
-     hands-on labs so all six read apart at a glance. Meal/break gets a
-     muted neutral since it's not session content. */
+     blue for general content, gold reserved for keynote as the marquee
+     event, and violet/teal/orange/rose accents for panel, social events,
+     hands-on labs, and meals so all six read apart at a glance even
+     side by side (meal_break is a warm rose specifically so it doesn't
+     read as a duller version of general_session's blue). */
   --type-keynote: var(--gold);
   --type-general_session: var(--steel-blue);
   --type-panel: #6a4c93;
-  --type-lightning_tip: #2f8f7a;
+  --type-social_event: #2f8f7a;
   --type-hands_on_lab: #b2562f;
-  --type-meal_break: #6b7a8f;
+  --type-meal_break: #a8446f;
 }
 
 :root[data-theme="dark"] {
@@ -64,9 +65,9 @@
   --type-keynote: var(--gold);
   --type-general_session: #7ba3d0;
   --type-panel: #a98fd1;
-  --type-lightning_tip: #5cc4ab;
+  --type-social_event: #5cc4ab;
   --type-hands_on_lab: #e08a5c;
-  --type-meal_break: #9db0c7;
+  --type-meal_break: #d98fae;
 }
 
 * {
@@ -318,8 +319,8 @@ button {
   background: var(--type-panel);
 }
 
-.session-bar-lightning_tip {
-  background: var(--type-lightning_tip);
+.session-bar-social_event {
+  background: var(--type-social_event);
 }
 
 .session-bar-hands_on_lab {
@@ -342,8 +343,8 @@ button {
   color: var(--type-panel);
 }
 
-.session-title-lightning_tip {
-  color: var(--type-lightning_tip);
+.session-title-social_event {
+  color: var(--type-social_event);
 }
 
 .session-title-hands_on_lab {

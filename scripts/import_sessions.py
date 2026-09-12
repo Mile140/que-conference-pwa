@@ -105,6 +105,7 @@ TYPE_KEYWORDS = [
     (r"\bpanel\b", "panel"),
     (r"round table|work.?thru|working session|workshop", "hands_on_lab"),
     (r"take.?off|board introductions|kick.?off", "keynote"),
+    (r"\bsocial\b|cocktail|reception|happy hour|networking", "social_event"),
 ]
 DEFAULT_TYPE = "general_session"
 

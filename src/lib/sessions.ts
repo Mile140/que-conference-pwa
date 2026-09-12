@@ -6,7 +6,7 @@ const CACHE_KEY = "sessions";
 
 export type SessionType =
   | "keynote"
-  | "lightning_tip"
+  | "social_event"
   | "hands_on_lab"
   | "panel"
   | "general_session"
@@ -14,7 +14,7 @@ export type SessionType =
 
 export const TYPE_LABELS: Record<SessionType, string> = {
   keynote: "Keynote",
-  lightning_tip: "Lightning Tip",
+  social_event: "Social Event",
   hands_on_lab: "Hands-On Lab",
   panel: "Panel",
   general_session: "General Session",
