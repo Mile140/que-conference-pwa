@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import BackButton from "../components/BackButton";
 import { supabase } from "../lib/supabase";
 import { attendee, authSession } from "../lib/auth";
 import { useAgenda } from "../lib/agenda";
@@ -55,7 +56,9 @@ export default function SessionDetail({ id }: SessionDetailProps) {
   const inAgenda = sessionIds.has(session.id);
 
   return (
-    <article class="card">
+    <>
+      <BackButton fallbackHref="/schedule" />
+      <article class="card">
       <span class="badge-gold">{TYPE_LABELS[session.type]}</span>
       <h2 style={{ marginTop: 8, marginBottom: 4 }}>{session.title}</h2>
       <p style={{ color: "var(--text-muted)", marginTop: 0 }}>
@@ -143,6 +146,7 @@ export default function SessionDetail({ id }: SessionDetailProps) {
           )}
         </div>
       )}
-    </article>
+      </article>
+    </>
   );
 }

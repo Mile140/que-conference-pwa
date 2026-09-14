@@ -1,4 +1,5 @@
 import { useEffect } from "preact/hooks";
+import BackButton from "../components/BackButton";
 import RouterLink from "../components/RouterLink";
 import { trackEvent } from "../lib/analytics";
 import { useSponsor } from "../lib/sponsors";
@@ -20,7 +21,9 @@ export default function SponsorDetail({ id }: SponsorDetailProps) {
   if (notFound || !sponsor) return <p>Sponsor not found.</p>;
 
   return (
-    <article class="card">
+    <>
+      <BackButton fallbackHref="/sponsors" />
+      <article class="card">
       {sponsor.logo_url && (
         <img src={sponsor.logo_url} alt={sponsor.name} style={{ maxHeight: 64, marginBottom: 12 }} />
       )}
@@ -63,6 +66,7 @@ export default function SponsorDetail({ id }: SponsorDetailProps) {
           ))}
         </div>
       )}
-    </article>
+      </article>
+    </>
   );
 }
