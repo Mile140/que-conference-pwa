@@ -163,12 +163,24 @@ function AttendeeEditor({ attendee, onSaved }: { attendee: AttendeeRow; onSaved:
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Email doubles as the login identity once someone's verified (it's what
-  // the OTP goes to, and it's what auth_user_id gets linked against) --
-  // editing it here for a verified attendee would silently break their
-  // login without also touching Supabase Auth, which this page doesn't do.
-  // Safe to fix pre-verification, when it's still just a plain data field.
-  const emailEditable = !attendee.auth_user_id;
+  // Email is always editable now -- e.g. swapping this row from one
+  // employee to a coworker who's taking their spot. Editing it for an
+  // already-verified attendee (auth_user_id set) can't just update the
+  // text field, though: email is what Supabase Auth's OTP goes to, and
+  // auth_user_id is a saved link to *that specific* Supabase Auth account,
+  // which still has the old address. Leaving auth_user_id pointing at the
+  // old account while the row shows a new email would mean the new
+  // person's OTP login creates its own separate Supabase Auth account that
+  // doesn't match this row's auth_user_id, so `ensureAttendeeRecord` in
+  // auth.ts wouldn't find this row and would silently create a duplicate
+  // one instead of claiming this one. Clearing auth_user_id/verified_at
+  // whenever the email changes on a verified row avoids that: this row
+  // goes back to "not yet verified," and the new email's owner claims it
+  // normally the next time they verify. This is also why editing the
+  // email used to be blocked entirely -- doing it via the Supabase
+  // dashboard instead (which doesn't know about this relationship) is
+  // what threw the foreign key error being fixed here.
+  const wasVerified = !!attendee.auth_user_id;
 
   function set<K extends keyof AttendeeFormState>(key: K, value: AttendeeFormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -205,20 +217,31 @@ function AttendeeEditor({ attendee, onSaved }: { attendee: AttendeeRow; onSaved:
       photo_url: form.photo_url || null,
       contact_opt_in: form.contact_opt_in,
     };
-    if (emailEditable) {
-      const trimmedEmail = form.email.trim().toLowerCase();
-      if (!trimmedEmail || !trimmedEmail.includes("@")) {
-        setSaving(false);
-        setError("Enter a valid email.");
-        return;
-      }
-      payload.email = trimmedEmail;
+
+    const trimmedEmail = form.email.trim().toLowerCase();
+    if (!trimmedEmail || !trimmedEmail.includes("@")) {
+      setSaving(false);
+      setError("Enter a valid email.");
+      return;
+    }
+    payload.email = trimmedEmail;
+
+    const emailChanged = trimmedEmail !== attendee.email.toLowerCase();
+    if (emailChanged && wasVerified) {
+      // Hand this row off to whoever owns the new address -- see the note
+      // above set(). They'll show up as "not yet verified" until they do.
+      payload.auth_user_id = null;
+      payload.verified_at = null;
     }
 
     const { error: err } = await supabase.from("attendees").update(payload).eq("id", attendee.id);
     setSaving(false);
     if (err) {
-      setError(err.message);
+      if (err.code === "23505") {
+        setError("That email already belongs to another attendee record -- edit or remove that one first.");
+      } else {
+        setError(err.message);
+      }
       return;
     }
     onSaved();
@@ -239,12 +262,13 @@ function AttendeeEditor({ attendee, onSaved }: { attendee: AttendeeRow; onSaved:
       <input
         value={form.email}
         onInput={(e) => set("email", (e.target as HTMLInputElement).value)}
-        disabled={!emailEditable}
         style={{ padding: 8 }}
       />
-      {!emailEditable && (
+      {wasVerified && (
         <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--text-muted)" }}>
-          Can't be changed here once someone's verified — it's tied to their login.
+          This person already verified. If you change the email (e.g. handing this spot to a coworker),
+          saving will reset it to "not yet verified" so the new email's owner can verify fresh — the
+          current owner's old sign-in will no longer work.
         </p>
       )}
 
