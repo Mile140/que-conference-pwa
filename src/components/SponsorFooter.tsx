@@ -38,6 +38,17 @@ export default function SponsorFooter() {
       {sponsor && (
         <RouterLink href={`/sponsors/${sponsor.id}`} style={{ textDecoration: "none", color: "inherit" }}>
           <div class="card" style={{ textAlign: "left" }}>
+            <div
+              style={{
+                fontSize: "0.7rem",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                color: "var(--text-muted)",
+                marginBottom: 6,
+              }}
+            >
+              Conference Sponsor
+            </div>
             {sponsor.logo_url && (
               <img
                 src={sponsor.logo_url}
