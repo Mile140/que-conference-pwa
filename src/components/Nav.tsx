@@ -4,7 +4,7 @@ import { isAdmin } from "../lib/auth";
 const LINKS: Array<{ href: string; label: string }> = [
   { href: "/", label: "Now & Next" },
   { href: "/schedule", label: "Schedule" },
-  { href: "/directory", label: "Directory" },
+  { href: "/directory", label: "Attendees" },
   { href: "/questions", label: "Questions" },
   { href: "/learning", label: "My List" },
   { href: "/speakers", label: "Speakers" },

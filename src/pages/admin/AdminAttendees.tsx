@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import AdminGuard from "../../components/AdminGuard";
 import PageHero from "../../components/PageHero";
+import { COMPANY_TYPE_GROUPS } from "../../lib/companyTypes";
 import { supabase } from "../../lib/supabase";
 import { uploadImage } from "../../lib/storageUpload";
 
@@ -13,6 +14,7 @@ interface AttendeeRow {
   email: string;
   name: string | null;
   company: string | null;
+  company_type: string | null;
   job_title: string | null;
   job_function: string | null;
   focus_areas: string[];
@@ -26,7 +28,7 @@ interface AttendeeRow {
 }
 
 const SELECT_COLS =
-  "id, email, name, company, job_title, job_function, focus_areas, photo_url, bio, contact_opt_in, is_speaker, auth_user_id, verified_at, imported_at";
+  "id, email, name, company, company_type, job_title, job_function, focus_areas, photo_url, bio, contact_opt_in, is_speaker, auth_user_id, verified_at, imported_at";
 
 export default function AdminAttendees(_props: AdminAttendeesProps) {
   return (
@@ -131,6 +133,7 @@ type AttendeeFormState = {
   email: string;
   name: string;
   company: string;
+  company_type: string;
   job_title: string;
   job_function: string;
   focus_areas: string;
@@ -144,6 +147,7 @@ function attendeeToForm(a: AttendeeRow): AttendeeFormState {
     email: a.email,
     name: a.name ?? "",
     company: a.company ?? "",
+    company_type: a.company_type ?? "",
     job_title: a.job_title ?? "",
     job_function: a.job_function ?? "",
     focus_areas: (a.focus_areas ?? []).join(", "),
@@ -190,6 +194,7 @@ function AttendeeEditor({ attendee, onSaved }: { attendee: AttendeeRow; onSaved:
     const payload: Record<string, unknown> = {
       name: form.name.trim() || null,
       company: form.company.trim() || null,
+      company_type: form.company_type || null,
       job_title: form.job_title.trim() || null,
       job_function: form.job_function.trim() || null,
       focus_areas: form.focus_areas
@@ -248,6 +253,24 @@ function AttendeeEditor({ attendee, onSaved }: { attendee: AttendeeRow; onSaved:
 
       <label style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Company / repair station</label>
       <input value={form.company} onInput={(e) => set("company", (e.target as HTMLInputElement).value)} style={{ padding: 8 }} />
+
+      <label style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Type of company</label>
+      <select
+        value={form.company_type}
+        onChange={(e) => set("company_type", (e.target as HTMLSelectElement).value)}
+        style={{ padding: 8 }}
+      >
+        <option value="">Select one…</option>
+        {COMPANY_TYPE_GROUPS.map((group) => (
+          <optgroup label={group.label} key={group.label}>
+            {group.options.map((opt) => (
+              <option value={opt.value} key={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
 
       <label style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Job title</label>
       <input value={form.job_title} onInput={(e) => set("job_title", (e.target as HTMLInputElement).value)} style={{ padding: 8 }} />

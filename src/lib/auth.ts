@@ -8,6 +8,7 @@ export interface Attendee {
   email: string;
   name: string | null;
   company: string | null;
+  company_type: string | null;
   job_title: string | null;
   job_function: string | null;
   focus_areas: string[];

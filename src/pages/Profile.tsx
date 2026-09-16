@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { route } from "preact-router";
 import { attendee, authLoading, authSession, refreshAttendee, signOut } from "../lib/auth";
+import { COMPANY_TYPE_GROUPS } from "../lib/companyTypes";
 import { supabase } from "../lib/supabase";
 
 interface ProfileProps {
@@ -14,6 +15,7 @@ interface ProfileProps {
 export default function Profile(_props: ProfileProps) {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
+  const [companyType, setCompanyType] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [jobFunction, setJobFunction] = useState("");
   const [focusAreas, setFocusAreas] = useState("");
@@ -26,6 +28,7 @@ export default function Profile(_props: ProfileProps) {
     if (a) {
       setName(a.name ?? "");
       setCompany(a.company ?? "");
+      setCompanyType(a.company_type ?? "");
       setJobTitle(a.job_title ?? "");
       setJobFunction(a.job_function ?? "");
       setFocusAreas((a.focus_areas ?? []).join(", "));
@@ -48,6 +51,7 @@ export default function Profile(_props: ProfileProps) {
       .update({
         name: name.trim() || null,
         company: company.trim() || null,
+        company_type: companyType || null,
         job_title: jobTitle.trim() || null,
         job_function: jobFunction.trim() || null,
         focus_areas: focusAreas
@@ -77,6 +81,24 @@ export default function Profile(_props: ProfileProps) {
 
         <label>Company / repair station</label>
         <input value={company} onInput={(e) => setCompany((e.target as HTMLInputElement).value)} style={fieldStyle} />
+
+        <label>Type of company</label>
+        <select
+          value={companyType}
+          onChange={(e) => setCompanyType((e.target as HTMLSelectElement).value)}
+          style={fieldStyle}
+        >
+          <option value="">Select one…</option>
+          {COMPANY_TYPE_GROUPS.map((group) => (
+            <optgroup label={group.label} key={group.label}>
+              {group.options.map((opt) => (
+                <option value={opt.value} key={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
 
         <label>Job title</label>
         <input value={jobTitle} onInput={(e) => setJobTitle((e.target as HTMLInputElement).value)} style={fieldStyle} />

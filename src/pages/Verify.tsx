@@ -56,7 +56,7 @@ export default function Verify(_props: VerifyProps) {
       <h2 style={{ marginTop: 0 }}>Verify your email</h2>
       <p style={{ color: "var(--text-muted)" }}>
         No password -- just an 8-digit code, once. Unlocks your personal agenda, the
-        attendee directory, Day-3 questions, session feedback, the photo wall, and your
+        Attendees page, Day-3 questions, session feedback, the photo wall, and your
         private learning list.
       </p>
 

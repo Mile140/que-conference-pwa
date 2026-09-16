@@ -41,7 +41,7 @@ export interface UsageStats {
 const PAGE_VIEW_LABELS: Record<string, string> = {
   view_home: "Now & Next",
   view_schedule: "Schedule",
-  view_directory: "Directory",
+  view_directory: "Attendees",
   view_questions: "Questions",
   view_learning: "Learning list",
   view_speakers: "Speakers",
