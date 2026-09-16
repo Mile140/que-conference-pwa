@@ -162,6 +162,8 @@ function AttendeeEditor({ attendee, onSaved }: { attendee: AttendeeRow; onSaved:
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Email is always editable now -- e.g. swapping this row from one
   // employee to a coworker who's taking their spot. Editing it for an
@@ -242,6 +244,25 @@ function AttendeeEditor({ attendee, onSaved }: { attendee: AttendeeRow; onSaved:
       } else {
         setError(err.message);
       }
+      return;
+    }
+    onSaved();
+  }
+
+  async function handleDelete() {
+    setDeleting(true);
+    setError(null);
+    // FKs from questions/votes/learning_items/feedback/photos/photo_comments/
+    // agenda_items/push_subscriptions/session_speakers/issue_reports are all
+    // ON DELETE CASCADE, so this also removes whatever this attendee
+    // submitted (their questions in the shared Q&A list, photos on the
+    // shared wall, etc). Fine for a genuine duplicate import row; worth the
+    // explicit two-step confirm below for anyone with real activity.
+    const { error: err } = await supabase.from("attendees").delete().eq("id", attendee.id);
+    setDeleting(false);
+    if (err) {
+      setError(err.message);
+      setConfirmingDelete(false);
       return;
     }
     onSaved();
@@ -342,9 +363,59 @@ function AttendeeEditor({ attendee, onSaved }: { attendee: AttendeeRow; onSaved:
       </label>
 
       {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-      <button type="button" class="btn-gold" onClick={handleSave} disabled={saving} style={{ alignSelf: "flex-start" }}>
-        {saving ? "Saving…" : "Save"}
-      </button>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <button type="button" class="btn-gold" onClick={handleSave} disabled={saving || deleting} style={{ alignSelf: "flex-start" }}>
+          {saving ? "Saving…" : "Save"}
+        </button>
+
+        {!confirmingDelete && (
+          <button
+            type="button"
+            onClick={() => setConfirmingDelete(true)}
+            disabled={saving || deleting}
+            style={{ padding: "8px 14px", background: "transparent", border: "1px solid crimson", color: "crimson" }}
+          >
+            Delete
+          </button>
+        )}
+      </div>
+
+      {confirmingDelete && (
+        <div
+          style={{
+            marginTop: 4,
+            padding: 10,
+            border: "1px solid crimson",
+            borderRadius: 6,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
+          <p style={{ margin: 0, fontSize: "0.85rem" }}>
+            Delete {attendee.name || attendee.email}? This also removes anything they submitted -- questions,
+            photos, feedback, their personal agenda -- and can't be undone.
+          </p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              style={{ padding: "8px 14px", background: "crimson", color: "white", border: "none", borderRadius: 6 }}
+            >
+              {deleting ? "Deleting…" : "Yes, delete"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmingDelete(false)}
+              disabled={deleting}
+              style={{ padding: "8px 14px", background: "transparent", border: "1px solid var(--border, #ddd)" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
