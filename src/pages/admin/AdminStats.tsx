@@ -1,6 +1,7 @@
 import AdminGuard from "../../components/AdminGuard";
 import PageHero from "../../components/PageHero";
 import { pageViewLabel, useUsageStats } from "../../lib/analytics";
+import { formatDay } from "../../lib/sessions";
 
 interface AdminStatsProps {
   path?: string;
@@ -79,6 +80,29 @@ function AdminStatsContent() {
                   <div key={s.id} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0" }}>
                     <span>{s.title}</span>
                     <strong>{s.views}</strong>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {stats.sessionRatingsBySession.length > 0 && (
+            <>
+              <h3 style={{ marginTop: 20, marginBottom: 10 }}>Session ratings</h3>
+              <div class="card">
+                {stats.sessionRatingsBySession.map((s) => (
+                  <div
+                    key={s.id}
+                    style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, padding: "6px 0" }}
+                  >
+                    <div>
+                      <div>{s.title}</div>
+                      <div style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{formatDay(s.day)}</div>
+                    </div>
+                    <strong style={{ whiteSpace: "nowrap" }}>
+                      {"★".repeat(Math.round(s.avg))}
+                      {"☆".repeat(5 - Math.round(s.avg))} {s.avg.toFixed(1)} ({s.count})
+                    </strong>
                   </div>
                 ))}
               </div>

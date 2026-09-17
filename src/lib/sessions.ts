@@ -65,6 +65,13 @@ export function formatTimeRange(session: { start: string; end: string }): string
   return `${formatTime(session.start)} – ${formatTime(session.end)}`;
 }
 
+const isoDayFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: VENUE_TIMEZONE });
+
+/** Today's date at the venue, as a "YYYY-MM-DD" string matching `session.day` -- for scrolling the Schedule page to the current day regardless of the viewer's own device timezone. */
+export function getVenueToday(): string {
+  return isoDayFormatter.format(new Date());
+}
+
 export function formatDay(dayIso: string): string {
   // dayIso is a plain date ("2026-09-16"); construct at noon UTC to avoid
   // any chance of the date itself shifting a calendar day under conversion.

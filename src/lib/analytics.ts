@@ -36,6 +36,7 @@ export interface UsageStats {
   pageViews: { eventType: string; count: number }[];
   topSessions: { id: string; title: string; views: number }[];
   topSponsors: { id: string; name: string; views: number }[];
+  sessionRatingsBySession: { id: string; title: string; day: string; avg: number; count: number }[];
 }
 
 const PAGE_VIEW_LABELS: Record<string, string> = {
@@ -90,6 +91,7 @@ export function useUsageStats() {
           issueReportsTotal,
           issueReportsOpen,
           eventsRes,
+          feedbackRes,
         ] = await Promise.all([
           count("attendees"),
           count("attendees", (q) => q.not("auth_user_id", "is", null)),
@@ -110,10 +112,23 @@ export function useUsageStats() {
             .select("event_type, target_id")
             .order("created_at", { ascending: false })
             .limit(5000),
+          // Ungrouped, unlike the count above -- needed to compute a
+          // per-session average, not just the total. Fine at this event's
+          // scale (one row per attendee per session they rated).
+          supabase.from("feedback").select("session_id, rating"),
         ]);
 
         if (cancelled) return;
         if (eventsRes.error) console.error("Failed to load analytics events", eventsRes.error);
+        if (feedbackRes.error) console.error("Failed to load feedback", feedbackRes.error);
+
+        const ratingSums = new Map<string, number>();
+        const ratingCounts = new Map<string, number>();
+        for (const f of feedbackRes.data ?? []) {
+          ratingSums.set(f.session_id, (ratingSums.get(f.session_id) ?? 0) + f.rating);
+          ratingCounts.set(f.session_id, (ratingCounts.get(f.session_id) ?? 0) + 1);
+        }
+        const ratedSessionIds = [...ratingCounts.keys()];
 
         const viewCounts = new Map<string, number>();
         const sessionViews = new Map<string, number>();
@@ -131,18 +146,31 @@ export function useUsageStats() {
         const topSessionIds = [...sessionViews.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id]) => id);
         const topSponsorIds = [...sponsorViews.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id]) => id);
 
-        const [sessionRows, sponsorRows] = await Promise.all([
+        const [sessionRows, sponsorRows, ratedSessionRows] = await Promise.all([
           topSessionIds.length
             ? supabase.from("sessions").select("id, title").in("id", topSessionIds)
             : Promise.resolve({ data: [] as { id: string; title: string }[] }),
           topSponsorIds.length
             ? supabase.from("sponsors").select("id, name").in("id", topSponsorIds)
             : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+          ratedSessionIds.length
+            ? supabase.from("sessions").select("id, title, day, start").in("id", ratedSessionIds)
+            : Promise.resolve({ data: [] as { id: string; title: string; day: string; start: string }[] }),
         ]);
         if (cancelled) return;
 
         const sessionTitleById = new Map((sessionRows.data ?? []).map((s) => [s.id, s.title]));
         const sponsorNameById = new Map((sponsorRows.data ?? []).map((s) => [s.id, s.name]));
+
+        const sessionRatingsBySession = (ratedSessionRows.data ?? [])
+          .map((s) => ({
+            id: s.id,
+            title: s.title,
+            day: s.day,
+            avg: ratingSums.get(s.id)! / ratingCounts.get(s.id)!,
+            count: ratingCounts.get(s.id)!,
+          }))
+          .sort((a, b) => a.day.localeCompare(b.day) || b.avg - a.avg);
 
         setStats({
           attendeesTotal,
@@ -159,6 +187,7 @@ export function useUsageStats() {
           pageViews: [...viewCounts.entries()].map(([eventType, c]) => ({ eventType, count: c })).sort((a, b) => b.count - a.count),
           topSessions: topSessionIds.map((id) => ({ id, title: sessionTitleById.get(id) ?? "(deleted session)", views: sessionViews.get(id)! })),
           topSponsors: topSponsorIds.map((id) => ({ id, name: sponsorNameById.get(id) ?? "(deleted sponsor)", views: sponsorViews.get(id)! })),
+          sessionRatingsBySession,
         });
       } catch (err) {
         if (cancelled) return;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import RouterLink from "../components/RouterLink";
 import CachedBanner from "../components/CachedBanner";
 import PageHero from "../components/PageHero";
@@ -8,6 +8,7 @@ import { useAgenda } from "../lib/agenda";
 import {
   formatDay,
   formatTimeRange,
+  getVenueToday,
   groupByDay,
   TYPE_LABELS,
   useSessions,
@@ -26,6 +27,8 @@ export default function Schedule(_props: ScheduleProps) {
   const [typeFilter, setTypeFilter] = useState("");
   const [myAgendaOnly, setMyAgendaOnly] = useState(false);
   const verified = authSession.value && attendee.value;
+  const dayRefs = useRef(new Map<string, HTMLElement>());
+  const scrolledToTodayRef = useRef(false);
 
   useEffect(() => {
     trackEvent("view_schedule");
@@ -48,6 +51,19 @@ export default function Schedule(_props: ScheduleProps) {
       (!myAgendaOnly || sessionIds.has(s.id))
   );
   const days = groupByDay(filtered);
+
+  // Scroll to today's day section once the schedule has loaded -- multi-day
+  // conference, so opening the app on day 2 shouldn't dump you at day 1
+  // every time. Guarded to fire only once per page visit (not on every
+  // filter change, which also changes `days`); if today isn't one of the
+  // conference days (before/after, or filtered out entirely) this just
+  // never finds a match and leaves the page at the top, which is fine.
+  useEffect(() => {
+    if (scrolledToTodayRef.current || loading || days.length === 0) return;
+    scrolledToTodayRef.current = true;
+    const el = dayRefs.current.get(getVenueToday());
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [days, loading]);
 
   return (
     <>
@@ -104,7 +120,7 @@ export default function Schedule(_props: ScheduleProps) {
       )}
 
       {days.map(({ day, sessions: daySessions }) => (
-        <section key={day}>
+        <section key={day} ref={(el) => { if (el) dayRefs.current.set(day, el); }}>
           <h2>{formatDay(day)}</h2>
           {daySessions.map((s) => (
             <RouterLink href={`/schedule/${s.id}`} key={s.id} style={{ textDecoration: "none", color: "inherit" }}>
