@@ -147,21 +147,6 @@ button {
   margin: 0 auto;
 }
 
-/* Schedule's scroll-to-today (Schedule.tsx) uses scrollIntoView, which
-   aligns the target's top edge with the scroll container's top edge -- but
-   .app-header is sticky and sits on top of that same spot, so without this
-   the day heading lands directly underneath the header instead of below it,
-   and the first *session row* ends up looking like the top of the page.
-   scroll-margin-top tells scrollIntoView to stop short by the header's
-   height instead. The value is a generous estimate of the header's real
-   height (padding + line height + safe-area inset) rather than a measured
-   exact number, since getting a few px of breathing room wrong is harmless
-   but this needing to track the header's actual CSS exactly would be
-   brittle. */
-.schedule-day {
-  scroll-margin-top: calc(64px + env(safe-area-inset-top));
-}
-
 .app-nav {
   display: flex;
   overflow-x: auto;

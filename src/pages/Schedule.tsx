@@ -62,7 +62,17 @@ export default function Schedule(_props: ScheduleProps) {
     if (scrolledToTodayRef.current || loading || days.length === 0) return;
     scrolledToTodayRef.current = true;
     const el = dayRefs.current.get(getVenueToday());
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!el) return;
+    // Plain scrollIntoView aligns the section's top with the *viewport's*
+    // top -- but .app-header is sticky and covers that same spot, so the
+    // day heading itself would land hidden behind the header, leaving the
+    // first session row looking like the top of the page. Measuring the
+    // header's actual rendered height (rather than guessing a fixed offset
+    // in CSS) and subtracting it from the target scroll position accounts
+    // for this correctly regardless of device/safe-area-inset differences.
+    const headerHeight = document.querySelector(".app-header")?.getBoundingClientRect().height ?? 0;
+    const targetTop = el.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
+    window.scrollTo({ top: Math.max(targetTop, 0), behavior: "smooth" });
   }, [days, loading]);
 
   return (
@@ -120,7 +130,7 @@ export default function Schedule(_props: ScheduleProps) {
       )}
 
       {days.map(({ day, sessions: daySessions }) => (
-        <section key={day} class="schedule-day" ref={(el) => { if (el) dayRefs.current.set(day, el); }}>
+        <section key={day} ref={(el) => { if (el) dayRefs.current.set(day, el); }}>
           <h2>{formatDay(day)}</h2>
           {daySessions.map((s) => (
             <RouterLink href={`/schedule/${s.id}`} key={s.id} style={{ textDecoration: "none", color: "inherit" }}>
