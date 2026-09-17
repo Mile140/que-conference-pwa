@@ -1,0 +1,29 @@
+# Cloudflare Workers static assets honors this file the same way Pages did.
+#
+# Without this, browsers can cache index.html and sw.js with the default
+# heuristic lifetime, so a returning visitor's cached shell can keep
+# referencing JS/CSS filenames from a previous deploy after those files are
+# gone (each build hashes asset filenames and the old ones aren't kept
+# around) -- "Failed to load module script ... MIME type text/html" as the
+# browser gets the SPA-fallback index.html instead of the missing script.
+# That's a real incident from 2026-09-17: a Chrome profile with a stale
+# cached shell white-screened while Incognito (no cache) loaded fine.
+#
+# Fix: the entry HTML and the service worker script must always be
+# revalidated (no-cache -- still cached, but conditionally, via a
+# round-trip), while the hashed, content-addressed asset files are safe to
+# cache forever since any content change gets a new filename.
+/index.html
+  Cache-Control: no-cache
+
+/
+  Cache-Control: no-cache
+
+/sw.js
+  Cache-Control: no-cache
+
+/manifest.webmanifest
+  Cache-Control: no-cache
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

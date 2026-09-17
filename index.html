@@ -9,10 +9,39 @@
     <!-- TODO: apple-touch-icon needs a real PNG (iOS doesn't honor SVG here) —
          add once the MikeCarey.Tech logo asset is in hand. -->
     <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="2026 QUE Group Conference" />
     <title>2026 QUE Group Conference — San Diego, CA · Sep 16–18, 2026</title>
+    <script>
+      // Safety net for the 2026-09-17 white-screen incident: a browser that
+      // somehow still has a stale cached index.html (e.g. a CDN edge that
+      // hasn't picked up the new deploy yet, or a cache that ignores the
+      // no-cache header in public/_headers) would reference a hashed JS
+      // filename from a previous build that no longer exists post-deploy.
+      // The server's SPA fallback serves index.html for that missing path,
+      // so the browser gets HTML where it expected a JS module and refuses
+      // to run it ("Failed to load module script ... MIME type text/html"),
+      // which leaves the page permanently blank since nothing ever mounts.
+      // A plain page reload fetches a fresh index.html (now correctly
+      // no-cache) pointing at the *current* files, which fixes it --  this
+      // just does that automatically instead of leaving the visitor stuck
+      // on a white screen with no obvious next step. Once-per-tab guard
+      // (sessionStorage) avoids a reload loop if the deploy is genuinely
+      // broken rather than just stale.
+      window.addEventListener(
+        "error",
+        function (e) {
+          var t = e.target;
+          if (t && t.tagName === "SCRIPT" && t.type === "module" && !sessionStorage.getItem("que-stale-shell-reload")) {
+            sessionStorage.setItem("que-stale-shell-reload", "1");
+            location.reload();
+          }
+        },
+        true
+      );
+    </script>
   </head>
   <body>
     <div id="app"></div>

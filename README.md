@@ -27,6 +27,8 @@ npm run build
 
 Output goes to `dist/`. SPA fallback (serving `index.html` for all client-side routes) is handled by `not_found_handling: "single-page-application"` in `wrangler.jsonc` — no `_redirects` file needed (that was a Pages-era mechanism; combining it with the Workers static-assets fallback causes a redirect-loop error on deploy).
 
+`public/_headers` (copied to `dist/_headers` by Vite, honored by Workers static assets the same way Pages honored it) forces `index.html`/`/`/`sw.js`/`manifest.webmanifest` to `no-cache` while hashed files under `/assets/*` cache forever. Without this, a browser can hold onto a cached shell referencing a previous deploy's JS/CSS filenames after those files are gone (each build hashes them fresh) — real incident on 2026-09-17: a stale Chrome profile white-screened with "Failed to load module script ... MIME type text/html" while Incognito loaded fine. `index.html` also has an inline script that force-reloads once per tab session if a module script fails to load, as a safety net for whatever slips past the cache headers (a CDN edge lagging behind a fresh deploy, etc.).
+
 ## Deploying
 
 Cloudflare Pages project, connected to this repo's git remote:
