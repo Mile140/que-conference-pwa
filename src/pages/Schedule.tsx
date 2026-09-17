@@ -120,7 +120,7 @@ export default function Schedule(_props: ScheduleProps) {
       )}
 
       {days.map(({ day, sessions: daySessions }) => (
-        <section key={day} ref={(el) => { if (el) dayRefs.current.set(day, el); }}>
+        <section key={day} class="schedule-day" ref={(el) => { if (el) dayRefs.current.set(day, el); }}>
           <h2>{formatDay(day)}</h2>
           {daySessions.map((s) => (
             <RouterLink href={`/schedule/${s.id}`} key={s.id} style={{ textDecoration: "none", color: "inherit" }}>
