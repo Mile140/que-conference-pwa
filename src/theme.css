@@ -382,3 +382,79 @@ button {
 .app-footer .credit {
   margin-top: var(--space-2);
 }
+
+/* Raffle picker (AdminRaffle) -- a slot-machine style reel. The window is a
+   fixed-height viewport with overflow hidden; the reel inside it is a tall
+   column of name/company rows that gets transformed (translateY) down to
+   land exactly on the winner's row. Top/bottom gradient masks fade the
+   entering/exiting rows like a real slot window rather than hard-cropping
+   them. */
+.raffle-reel-window {
+  position: relative;
+  height: 96px;
+  overflow: hidden;
+  border: 2px solid var(--brand-highlight);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+}
+
+.raffle-reel-window::before,
+.raffle-reel-window::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 28px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.raffle-reel-window::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg-elevated), transparent);
+}
+
+.raffle-reel-window::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--bg-elevated), transparent);
+}
+
+.raffle-reel-item {
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 var(--space-3);
+}
+
+.raffle-reel-item strong {
+  font-size: 1.15rem;
+}
+
+.raffle-reel-item span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+@keyframes raffle-winner-pop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.raffle-winner-card {
+  animation: raffle-winner-pop 0.35s ease-out;
+  border: 2px solid var(--brand-highlight);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  text-align: center;
+}

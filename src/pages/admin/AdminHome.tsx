@@ -94,6 +94,13 @@ function AdminHomeContent() {
       </section>
 
       <section class="card">
+        <h3 style={{ marginTop: 0 }}>Live event</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <RouterLink href="/admin/raffle">Raffle picker</RouterLink>
+        </div>
+      </section>
+
+      <section class="card">
         <h3 style={{ marginTop: 0 }}>Insights</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <RouterLink href="/admin/stats">Usage stats</RouterLink>

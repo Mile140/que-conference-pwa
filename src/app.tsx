@@ -33,6 +33,7 @@ import AdminInfoPages from "./pages/admin/AdminInfoPages";
 import AdminPhotos from "./pages/admin/AdminPhotos";
 import AdminFeedback from "./pages/admin/AdminFeedback";
 import AdminStats from "./pages/admin/AdminStats";
+import AdminRaffle from "./pages/admin/AdminRaffle";
 
 export default function App() {
   return (
@@ -72,6 +73,7 @@ export default function App() {
           <AdminPhotos path="/admin/photos" />
           <AdminFeedback path="/admin/feedback" />
           <AdminStats path="/admin/stats" />
+          <AdminRaffle path="/admin/raffle" />
         </Router>
       </main>
       <SponsorFooter />
